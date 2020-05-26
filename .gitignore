@@ -1,0 +1,20 @@
+# Set the default behavior, in case people don't have core.autocrlf set:
+* text eol=lf
+
+# All that starts with dot:
+.* 
+
+# IntelliJ IDEA files:
+*.iml
+.idea/
+
+# Data files:
+data/
+
+# Generated files:
+node_modules/
+dist/
+__pycache__
+
+# External sources:
+client/similarity-visualisation
