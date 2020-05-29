@@ -6,6 +6,8 @@ import json
 import collections
 import numpy
 import typing
+import datetime
+import dateutil.parser
 from dataclasses import dataclass
 
 
@@ -15,6 +17,7 @@ class RawEvaluation:
     group: str
     useCase: str
     rating: typing.Dict[str, float]
+    submitTime: datetime.datetime
 
 
 @dataclass
@@ -54,6 +57,7 @@ def main():
 
     evaluations = normalize_with_respect_to_method(
         evaluations, "nkod-_title_description_.join.reduce.tlsh.tlsh")
+    evaluations = keep_last_submits(evaluations)
 
     print("# all data count:", len(evaluations))
     evaluate_and_print(evaluations)
@@ -76,7 +80,8 @@ def load_evaluations() -> typing.List[RawEvaluation]:
             content["task"]["user"],
             content["task"]["group"],
             content["task"].get("useCaseId", None),
-            {key: float(value) for key, value in content["rating"].items()}
+            {key: float(value) for key, value in content["rating"].items()},
+            dateutil.parser.parse(content["task"]["timePost"])
         ))
     return result
 
@@ -120,8 +125,20 @@ def normalize_with_respect_to_method(
             for key, value in item.rating.items()
         }
         result.append(RawEvaluation(
-            item.user, item.group, item.useCase, rating))
+            item.user, item.group, item.useCase, rating, item.submitTime))
     return result
+
+
+def keep_last_submits(data: typing.List[RawEvaluation]) \
+        -> typing.List[RawEvaluation]:
+    result = {}
+    for item in data:
+        ref = item.user + ":" + item.useCase
+        if ref not in result:
+            result[ref] = item
+        elif result[ref].submitTime < item.submitTime:
+            result[ref] = item
+    return list(result.values())
 
 
 def evaluate_and_print(evaluations: typing.List[RawEvaluation]):

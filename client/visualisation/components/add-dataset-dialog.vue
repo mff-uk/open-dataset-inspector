@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    v-model="value"
+    v-model="visible"
     max-width="40rem"
   >
     <v-card>
@@ -45,7 +45,7 @@
 export default {
   "name": "add-dataset-dialog",
   "props": {
-    "value": { "type": Boolean, "required": true },
+    "visible": { "type": Boolean, "required": true },
   },
   "data": () => ({
     "collection": "v1",
@@ -56,11 +56,10 @@ export default {
   }),
   "methods": {
     "onClose": function () {
-      this.$emit("input", false);
+      this.$emit("reject", false);
     },
     "onAdd": function () {
-      this.$emit("input", false);
-      this.$emit("add-dataset", {
+      this.$emit("accept", {
         "collection": this.collection,
         "dataset": this.url,
       });

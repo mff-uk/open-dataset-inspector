@@ -9,20 +9,56 @@
       :nodes="nodes"
       :edges="edges"
       :labels="labels"
-      @add-dataset="onAddDataset"
+      :nodes-properties="nodesProperties"
+      :highlight-options="highlightOptions"
+      :paths="paths"
+      :paths-are-available="pathsAreAvailable"
+      @add-dataset="showDatasetDialog = true"
       @remove-dataset="onRemoveDataset"
     />
-    <vis-container
-      v-if="activeView === 1"
+    <similarity-visualisation
+      v-if="activeView > 0"
       :left-dataset="datasets[0]"
       :right-dataset="datasets[1]"
-      @pathsChanged="onSetPaths"
+      :paths="paths"
+      :activeView="activeView"
     />
+    <div style="bottom: 1rem; right: 2.5rem; position: fixed;">
+      <v-row>
+        <dialog-menu
+          @show-mapping-dialog="showMappingDialog = true"
+          @show-path-dialog="showPathDialog = true"
+          @show-highlight-dialog="showHighlightDialog = true"
+        />
+        &nbsp;
+        <visualisation-menu
+          v-model="activeView"
+        />
+      </v-row>
+    </div>
     <dataset-dialog
-      v-model="datasetDialogVisible"
-      @add-dataset="addDataset"
-      @leftDatasetChanged="onSetLeftDataset"
-      @rightDatasetChanged="onSetRightDataset"
+      :visible="showDatasetDialog"
+      @accept="addDataset"
+      @reject="showDatasetDialog = false"
+    />
+    <mapping-dialog
+      :visible="showMappingDialog"
+      :options="mappingOptions"
+      @accept="changeMappingOptions"
+      @reject="showMappingDialog = false"
+    />
+    <path-dialog
+      :visible="showPathDialog"
+      :options="pathOptions"
+      :dataset-count="datasets.length"
+      @accept="changePathOptions"
+      @reject="showPathDialog = false"
+    />
+    <highlight-dialog
+      :visible="showHighlightDialog"
+      :options="highlightOptions"
+      @accept="changeHighlightOptions"
+      @reject="showHighlightDialog = false"
     />
   </v-container>
 </template>
@@ -31,27 +67,56 @@
 import { mapGetters } from "vuex";
 
 import NetworkVisualisation from "./network/network-visualisation.vue";
-import AddDatasetDialog from "./add-dataset-dialog.vue";
+import AddDatasetDialog from "./components/add-dataset-dialog.vue";
+import MappingFilterDialog from "./components/mapping-filter-dialog.vue";
 import {
   ADD_DATASET,
+  REMOVE_DATASET,
+  SET_MAPPING_OPTIONS,
+  SET_PATH_OPTIONS,
   GET_DATASETS,
   GET_LABELS,
   GET_NODES,
   GET_EDGES,
   GET_HIERARCHY,
+  GET_NODES_PROPERTIES,
+  GET_SIMILARITY_AVAILABLE,
+  GET_SIMILARITY_PATHS,
 } from "./visualisation-store";
-import { VisContainer } from "../similarity-visualisation";
+import { SimilarityVisualisation } from "../similarity-visualisation";
+import {
+  createMappingFilters,
+  createDefaultMappingOptions,
+  createDefaultHighlightFilterOptions,
+  createDefaultPathOptions,
+} from "./visualisation-service.ts";
+import SelectPathDialog from "./components/select-path-dialog.vue";
+import HighlightDialog from "./components/highlight-filter-dialog.vue";
+import DialogMenu from "./components/dialog-menu.vue";
+import VisualisationMenu from "./components/visualisation-menu.vue";
 
 export default {
   "name": "visualisation",
   "components": {
     "dataset-dialog": AddDatasetDialog,
     "network-visualisation": NetworkVisualisation,
-    "vis-container": VisContainer,
+    "similarity-visualisation": SimilarityVisualisation,
+    "mapping-dialog": MappingFilterDialog,
+    "path-dialog": SelectPathDialog,
+    "highlight-dialog": HighlightDialog,
+    "dialog-menu": DialogMenu,
+    "visualisation-menu": VisualisationMenu,
   },
   "data": () => ({
-    "datasetDialogVisible": false,
-    "activeView": 1,
+    "showDatasetDialog": false,
+    "showMappingDialog": false,
+    "showPathDialog": false,
+    "showHighlightDialog": false,
+    //
+    "activeView": 2,
+    "mappingOptions": createDefaultMappingOptions(),
+    "highlightOptions": createDefaultHighlightFilterOptions(),
+    "pathOptions": createDefaultPathOptions(),
   }),
   "computed": {
     ...mapGetters("hierarchy", {
@@ -60,14 +125,22 @@ export default {
       "edges": GET_EDGES,
       "labels": GET_LABELS,
       "hierarchy": GET_HIERARCHY,
+      "nodesProperties": GET_NODES_PROPERTIES,
+      "pathsAreAvailable": GET_SIMILARITY_AVAILABLE,
+      "paths": GET_SIMILARITY_PATHS,
     }),
   },
   "mounted": function () {
+    this.$store.dispatch(
+      SET_MAPPING_OPTIONS,
+      createMappingFilters(this.mappingOptions)
+    );
+    //
     if (this.$route.query.dataset && this.$route.query.collection) {
-      this.$route.query.dataset.forEach((url) => {
+      asArray(this.$route.query.dataset).forEach((url) => {
         this.$store.dispatch(
           ADD_DATASET, {
-            "url": url,
+            "dataset": url,
             "collection": this.$route.query.collection,
           }
         );
@@ -75,17 +148,31 @@ export default {
     }
   },
   "methods": {
-    "onAddDataset": function () {
-      this.datasetDialogVisible = true;
-    },
-    "onRemoveDataset": function (index) {
-      console.log("TODO onRemoveDataset", index);
-    },
-    "onSetPaths": function (name) {
-      console.log("TODO onSetPath", name);
-    },
     "addDataset": function (dataset) {
+      this.showDatasetDialog = false;
+      //
       this.$store.dispatch(ADD_DATASET, dataset);
+    },
+    "onRemoveDataset": function (dataset) {
+      this.$store.dispatch(REMOVE_DATASET, dataset);
+    },
+    "onSetPaths": function () {
+      this.showPathDialog = true;
+    },
+    "changePathOptions": function (options) {
+      this.showPathDialog = false;
+      //
+      this.pathOptions = options;
+      this.$store.dispatch(SET_PATH_OPTIONS, {
+        "leftDataset": this.datasets[0],
+        "rightDataset": this.datasets[1],
+        "options": options,
+      });
+    },
+    "changeHighlightOptions": function (options) {
+      this.showHighlightDialog = false;
+      //
+      this.highlightOptions = options;
     },
     "onSetLeftDataset": function (url, collection) {
       console.log("onSetLeftDataset", url, collection);
@@ -93,6 +180,23 @@ export default {
     "onSetRightDataset": function (url, collection) {
       console.log("onSetRightDataset", url, collection);
     },
+    "changeMappingOptions": function (options) {
+      this.showMappingDialog = false;
+      //
+      this.mappingOptions = options;
+      this.$store.dispatch(
+        SET_MAPPING_OPTIONS,
+        createMappingFilters(this.mappingOptions)
+      );
+    },
   },
 };
+
+function asArray(value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  return [value];
+}
+
 </script>

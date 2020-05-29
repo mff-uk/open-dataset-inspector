@@ -36,7 +36,9 @@ AdjacencyList = typing.Dict[str, typing.Set[str]]
 
 @dataclass
 class Path:
+    """Node int he middle of the path."""
     shared: str
+    """Path with start/end and the start and end respectively."""
     nodes: typing.Tuple[str]
 
     def __hash__(self):
@@ -47,51 +49,16 @@ class Path:
 
 
 def main():
-    left = load_dataset_from_file("../data/matejik/item_000000.json")
-    right = load_dataset_from_file("../data/matejik/item_000001.json")
+    left = _load_dataset_from_file("../data/mapping/v1/000005.json")
+    right = _load_dataset_from_file("../data/mapping/v1/000049.json")
     all_paths = find_all_path(left, right)
-    max_path = max([len(path.nodes) for path in all_paths])
-    print("Max path:", max_path)
-    if False:  # Analytics
-        print("left entries:", len(_collect_entries(left)))
-        print("right entries:", len(_collect_entries(right)))
-        paths_from_left = {path.nodes[0]: path for path in all_paths}
-        paths_from_right = {path.nodes[-1]: path for path in all_paths}
-        print("paths from left", len(paths_from_left))
-        print("paths from left", len(paths_from_right))
-        print("left nodes without path:", [
-            item
-            for item in _collect_entries(left)
-            if item not in paths_from_left
-        ])
-        print("right nodes without path:", [
-            item
-            for item in _collect_entries(right)
-            if item not in paths_from_right
-        ])
-        print("Shortest paths count", len(select_closes_for_each(all_paths)))
-        exit()
-
-    exit()
-
-    # OUTPUT
-    with open("../data/matejik/000000_000001_shortest.json", "w") as stream:
-        json.dump(paths_to_output(
-            select_closes_for_each(all_paths),
-            [left, right]), stream, indent=2)
-    with open("../data/matejik/000000_000001_all.json", "w") as stream:
-        json.dump(paths_to_output(all_paths, [left, right]), stream, indent=2)
-    for max_length in range(max_path):
-        paths = filter_paths_by_length(all_paths, max_length)
-        if not paths:
-            continue
-        print("With threshold", max_length, "we have", len(paths), "paths")
-        file_name = "000000_000001_" + str(max_length).zfill(2) + ".json"
-        with open("../data/matejik/" + file_name, "w") as stream:
-            json.dump(paths_to_output(paths, [left, right]), stream, indent=2)
+    closest_paths = select_closest_for_each(all_paths, {"distance": 3})
+    print(json.dumps(paths_to_output(
+        closest_paths, [left, right]), indent=2)
+    )
 
 
-def load_dataset_from_file(file: str) -> Dataset:
+def _load_dataset_from_file(file: str) -> Dataset:
     with open(file, encoding="utf-8") as stream:
         content = json.load(stream)
     return load_dataset_from_json(content)
@@ -111,6 +78,8 @@ def load_dataset_from_json(content) -> Dataset:
     ]
     return Dataset(content["@id"], mappings, hierarchy)
 
+
+# region Collect paths
 
 def find_all_path(left: Dataset, right: Dataset) -> typing.List[Path]:
     adjacency_list = _prepare_adjacency_list(
@@ -147,7 +116,7 @@ def _find_path(
         adjacency_list: AdjacencyList, left: str, right: str) \
         -> typing.List[Path]:
     if left == right:
-        return [Path(left, tuple(left))]
+        return [Path(left, tuple([left]))]
     left_visited = set()
     left_level = {left}
     right_visited = set()
@@ -207,10 +176,26 @@ def _expand_level(
     return new_nodes, new_paths
 
 
-def paths_to_output(paths: typing.List[Path], datasets: typing.List[Dataset]):
+# endregion
+
+def paths_to_output(
+        paths: typing.List[Path], datasets: typing.List[Dataset],
+        metadata: typing.Dict = None):
+    path_lends = [len(path.nodes) for path in paths]
+
+    if metadata is None:
+        metadata = {}
+
     return {
         "metadata": {
+            **metadata,
             "datasets": [dataset.id for dataset in datasets],
+        },
+        "similarity": {
+            "max": max(path_lends),
+            "average": sum(path_lends) / len(path_lends),
+            "sum": sum(path_lends),
+            "min": min(path_lends)
         },
         "paths": [
             {
@@ -221,35 +206,45 @@ def paths_to_output(paths: typing.List[Path], datasets: typing.List[Dataset]):
     }
 
 
-def filter_paths_by_length(
-        paths: typing.List[Path], max_length: int) -> typing.List[Path]:
+# region Path filters and selectors
+
+def select_paths_by_length(paths: typing.List[Path], options) \
+        -> typing.List[Path]:
     """
     Return all paths shorted than given threshold.
     Two neighbouring nodes have paths of size 2.
     """
+    max_length = options.get("distance", 2)
     return [path for path in paths if len(path.nodes) <= max_length]
 
 
-def select_closes_for_each(paths: typing.List[Path]) -> typing.List[Path]:
+def select_closest_for_each(paths: typing.List[Path], options: any = None) \
+        -> typing.List[Path]:
     """
     For each entity in left and right choose the closes element from the other
     set.
     """
     shortest_paths: typing.Dict[str, Path] = {}
 
-    def update_shortest(item: str, path: Path):
+    def update_shortest(item: str, new_path: Path):
         if item not in shortest_paths:
-            shortest_paths[item] = path
-        elif len(shortest_paths[item].nodes) > len(path.nodes):
-            shortest_paths[item] = path
+            shortest_paths[item] = new_path
+        elif len(shortest_paths[item].nodes) > len(new_path.nodes):
+            shortest_paths[item] = new_path
 
     for path in paths:
         update_shortest(path.nodes[0], path)
         update_shortest(path.nodes[-1], path)
 
-    unique_paths = set(shortest_paths.values())
-    return list(unique_paths)
+    unique_paths = list(set(shortest_paths.values()))
 
+    if "distance" in options:
+        unique_paths = select_paths_by_length(unique_paths, options)
+
+    return unique_paths
+
+
+# endregion
 
 if __name__ == "__main__":
     main()

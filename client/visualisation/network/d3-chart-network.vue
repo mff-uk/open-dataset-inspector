@@ -17,8 +17,16 @@
       class="tooltip"
       style="position: absolute; opacity: 0.0; top: 0;"
     >
+      <span v-show="selected.directlyMapped">
+        Directly mapped
+      </span>
+      <span v-show="!selected.directlyMapped">
+        Reduced
+      </span>
+      <br>
       ID:{{ selected.id }} <br>
-      Label: {{ selected.label }}
+      Label: {{ selected.label }} <br>
+      Tokens: {{ selected.mappedBy }}
     </div>
     <div style="position: absolute; top: -10rem;">
       <input
@@ -40,6 +48,9 @@ export default {
     "selected": {
       "id": "",
       "label": "",
+      "directlyMapped": false,
+      "node": undefined,
+      "mappedBy": "",
     },
     "computingPositions": false,
     "computingProgress": 0,
@@ -49,53 +60,13 @@ export default {
     "edges": Array,
     "highlight": Object,
     "labels": Object,
+    "nodesProperties": Object,
   },
   "mounted": function () {
-    const svg = d3.select(this.$el).select("svg")
-      .attr("width", "100%")
-      .attr("height", "100%")
-      .call(d3.zoom().on("zoom", () => {
-        svg.attr("transform", d3.event.transform);
-      }))
-      .append("g");
-
-    const tooltip = d3.select(this.$el).select("div.tooltip");
-
-    const bounding = this.$el.getBoundingClientRect();
-    const center = d3.forceCenter(bounding.width / 2, bounding.height / 2);
-    const simulation = d3.forceSimulation(null)
-      .force("charge", d3.forceManyBody())
-      .force("center", center);
-
-    this.$local = {
-      "svg": svg,
-      "tooltip": tooltip,
-      "actions": {},
-      "simulation": simulation,
-    };
-
-    const $this = this;
-
-    this.$local.actions.onMouseOver = (item) => {
-      $this.$local.tooltip
-        .style("left", `${d3.event.layerX}px`)
-        .style("top", `${d3.event.layerY}px`);
-      $this.$local.tooltip
-        .transition()
-        .duration(200)
-        .style("opacity", 0.9);
-      $this.selected = {
-        "id": item.id,
-        "label": this.labels[item.id],
-      };
-    };
-
-    this.$local.actions.onMouseOut = () => {
-      $this.$local.tooltip
-        .transition()
-        .duration(500)
-        .style("opacity", 0);
-    };
+    initializeD3Svg(this, this.$el);
+    // Initial calls.
+    this.updateNetwork();
+    this.updateColors();
   },
   "watch": {
     "nodes": function () {
@@ -131,21 +102,83 @@ export default {
   },
 };
 
+function initializeD3Svg($this, element) {
+  const svg = d3.select(element).select("svg")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .call(d3.zoom().on("zoom", () => {
+      svg.attr("transform", d3.event.transform);
+    }))
+    .append("g");
+
+  svg.append("g").attr("class", "lines");
+  svg.append("g").attr("class", "nodes");
+
+  const tooltip = d3.select(element).select("div.tooltip");
+
+  const bounding = element.getBoundingClientRect();
+  const center = d3.forceCenter(bounding.width / 2, bounding.height / 2);
+  const simulation = d3.forceSimulation(null)
+    .force("charge", d3.forceManyBody())
+    .force("center", center);
+
+  $this.$local = {
+    "svg": svg,
+    "tooltip": tooltip,
+    "actions": {},
+    "simulation": simulation,
+  };
+
+  $this.$local.actions.onMouseOver = (item) => {
+    $this.$local.tooltip
+      .style("left", `${d3.event.layerX}px`)
+      .style("top", `${d3.event.layerY}px`);
+    $this.$local.tooltip
+      .transition()
+      .duration(200)
+      .style("opacity", 0.9);
+    const nodeProperties = $this.nodesProperties[item.id];
+    $this.selected = {
+      "id": item.id,
+      "label": $this.labels[item.id],
+      "node": nodeProperties,
+      "mappedBy": "",
+    };
+    if (nodeProperties !== undefined) {
+      $this.selected.directlyMapped = nodeProperties.directlyMapped;
+      if (nodeProperties.mappedBy.size > 0) {
+        const mappedByStr = Array.from(nodeProperties.mappedBy).join("', '");
+        $this.selected.mappedBy = `'${mappedByStr}'`;
+      }
+    }
+  };
+
+  $this.$local.actions.onMouseOut = () => {
+    $this.$local.tooltip
+      .transition()
+      .duration(500)
+      .style("opacity", 0);
+  };
+}
+
 function updateNetwork(
   svg, simulation, edges, nodes, highlight, actions, setComputing
 ) {
   const linkElements = svg
+    .select("g.lines")
     .selectAll("line")
     .data(edges);
-
+  linkElements.exit().remove();
   linkElements.enter()
     .append("line")
     .attr("stroke", "#999")
     .attr("stroke-opacity", 0.6);
+
   const nodeElements = svg
+    .select("g.nodes")
     .selectAll("circle")
     .data(nodes);
-
+  nodeElements.exit().remove();
   nodeElements.enter()
     .append("circle")
     .attr("stroke", "#fff")
@@ -154,14 +187,20 @@ function updateNetwork(
     .on("mouseover", actions.onMouseOver)
     .on("mouseout", actions.onMouseOut);
 
-  updatePositions(
-    simulation, nodes, edges, linkElements, nodeElements, setComputing
-  );
+  updatePositions(svg, simulation, nodes, edges, setComputing);
 }
 
-function updatePositions(
-  simulation, nodes, edges, linkElements, nodeElements, setComputing
-) {
+function updatePositions(svg, simulation, nodes, edges, setComputing) {
+  const linkElements = svg
+    .select("g.lines")
+    .selectAll("line")
+    .data(edges);
+
+  const nodeElements = svg
+    .select("g.nodes")
+    .selectAll("circle")
+    .data(nodes);
+
   const START_ALPHA = 1.0;
   const UPDATE_ALPHA = 0.05;
 
@@ -203,13 +242,11 @@ function updateColors(svg, nodes, highlight) {
     .selectAll("circle")
     .data(nodes)
     .attr("fill", (node) => selectColor(node, highlight));
-  // TODO Multicolor
+  // TODO Multicolor?
   // https://www.d3-graph-gallery.com/graph/pie_basic.html
-  // gradient
 }
 
 function selectColor(node, highlight) {
-  // TODO We can return all available colors.
   let finalColor = null;
   Object.keys(highlight).forEach((color) => {
     if (highlight[color].has(node.id)) {
@@ -258,8 +295,8 @@ function addDragSupport(simulation) {
 }
 
 /**
-   * Need element in the  DOM.
-   */
+ * Need element in the  DOM.
+ */
 function copyToClipboard(value) {
   const copyText = document.getElementById("copy-to-clipboard");
   copyText.value = `https://www.wikidata.org/wiki/${value}`;

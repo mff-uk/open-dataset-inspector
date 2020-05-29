@@ -76,6 +76,7 @@ function createHttpApi() {
     (req, res) => streamMappingCollections(res)
   );
   // curl -X POST -F "dataset=@000001.json" -F "dataset=@000005.json"
+  //  -F 'options={"method": "closest"}'
   //  localhost:8065/api/v1/mapping-similarity
   router.post(
     "/mapping-similarity",
