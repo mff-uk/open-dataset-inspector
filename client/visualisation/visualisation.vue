@@ -113,7 +113,7 @@ export default {
     "showPathDialog": false,
     "showHighlightDialog": false,
     //
-    "activeView": 2,
+    "activeView": 0,
     "mappingOptions": createDefaultMappingOptions(),
     "highlightOptions": createDefaultHighlightFilterOptions(),
     "pathOptions": createDefaultPathOptions(),
