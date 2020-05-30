@@ -41,7 +41,7 @@
 
 <script>
 export default {
-  "name": "highlight-filter-dialog",
+  "name": "highlight-options-dialog",
   "props": {
     "visible": { "type": Boolean, "required": true },
     "options": { "type": Object, "required": true },

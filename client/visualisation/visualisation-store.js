@@ -4,6 +4,9 @@ import {
   fetchLabels,
   fetchSimilarity,
 } from "./visualisation-api.ts";
+import {
+  createDefaultPathOptions,
+} from "./visualisation-service.ts";
 
 export const STORE = "hierarchy";
 
@@ -16,8 +19,13 @@ export const REMOVE_DATASET = `${STORE}/${REMOVE_DATASET_ACTION}`;
 const SET_MAPPING_OPTIONS_ACTION = "set_mapping_filter";
 export const SET_MAPPING_OPTIONS = `${STORE}/${SET_MAPPING_OPTIONS_ACTION}`;
 
-const SET_PATH_OPTIONS_ACTION = "fetch_paths";
-export const SET_PATH_OPTIONS = `${STORE}/${SET_PATH_OPTIONS_ACTION}`;
+const SET_SIMILARITY_OPTIONS_ACTION = "set_similarity_options";
+// eslint-disable-next-line operator-linebreak
+export const SET_SIMILARITY_OPTIONS =
+  `${STORE}/${SET_SIMILARITY_OPTIONS_ACTION}`;
+
+const FETCH_SIMILARITY_ACTION = "fetch_paths";
+export const FETCH_SIMILARITY = `${STORE}/${FETCH_SIMILARITY_ACTION}`;
 
 export const GET_DATASETS = "get_datasets";
 
@@ -35,6 +43,8 @@ export const GET_SIMILARITY_AVAILABLE = "get_similarity_paths_available";
 
 export const GET_SIMILARITY_PATHS = "get_similarity_paths";
 
+export const GET_SIMILARITY_OPTIONS = "get_similarity_options";
+
 export function createStore() {
   return {
     "namespaced": true,
@@ -49,10 +59,12 @@ export function createStore() {
       // Nodes metadata
       "labels": {},
       "nodesProperties": {},
-      // Filters for 'filteredDatasets'.
+      // Filters for mappings, used to create 'filteredDatasets'.
       "mappingFilter": (mappings) => mappings,
       // Similarity as fetched, is connected to selected datasets.
       "similarity": emptySimilarity(),
+      // Path options used for auto-fetch.
+      "similarityOptions": createDefaultPathOptions(),
     },
     "mutations": {
       [createDataset.name]: createDataset,
@@ -61,8 +73,11 @@ export function createStore() {
       [rebuildHierarchy.name]: rebuildHierarchy,
       [addLabels.name]: addLabels,
       [rebuildNodesProperties.name]: rebuildNodesProperties,
-      [setMappingFilter.name]: setMappingFilter,
+      [setMappingOptions.name]: setMappingOptions,
+      [clearSimilarity.name]: clearSimilarity,
       [setSimilarity.name]: setSimilarity,
+      [setSimilarityLoading.name]: setSimilarityLoading,
+      [setSimilarityOptions.name]: setSimilarityOptions,
     },
     "getters": {
       [GET_DATASETS]: (state) => Object.values(state.filteredDatasets),
@@ -83,12 +98,14 @@ export function createStore() {
       [GET_NODES_PROPERTIES]: (state) => state.nodesProperties,
       [GET_SIMILARITY_AVAILABLE]: (state) => state.similarity.fetched,
       [GET_SIMILARITY_PATHS]: (state) => state.similarity.data.paths,
+      [GET_SIMILARITY_OPTIONS]: (state) => state.similarityOptions,
     },
     "actions": {
       [ADD_DATASET_ACTION]: addDatasetAction,
       [REMOVE_DATASET_ACTION]: removeDatasetAction,
       [SET_MAPPING_OPTIONS_ACTION]: setMappingOptionAction,
-      [SET_PATH_OPTIONS_ACTION]: setPathOptionsAction,
+      [SET_SIMILARITY_OPTIONS_ACTION]: setSimilarityOptionsAction,
+      [FETCH_SIMILARITY_ACTION]: fetchSimilarityAction,
     },
   };
 }
@@ -100,6 +117,7 @@ export function createStore() {
 function emptySimilarity() {
   return {
     "fetched": false,
+    "loading": false,
     "data": {},
     "datasets": [],
   };
@@ -128,8 +146,6 @@ function createDataset(state, event) {
     ...state.filteredDatasets,
     [event.id]: dataset,
   };
-  // Remove paths as we changed the datasets.
-  state.similarity = emptySimilarity();
 }
 
 function updateDataset(state, event) {
@@ -151,15 +167,11 @@ function updateDataset(state, event) {
       "mappings": state.mappingFilter(event.data.mappings),
     }),
   };
-  // Remove paths as we changed the datasets.
-  state.similarity = emptySimilarity();
 }
 
 function deleteDataset(state, event) {
   Vue.delete(state.datasets, event.id);
   Vue.delete(state.filteredDatasets, event.id);
-  // Remove paths as we changed the datasets.
-  state.similarity = emptySimilarity();
 }
 
 function rebuildHierarchy(state) {
@@ -234,7 +246,7 @@ function rebuildNodesProperties(state) {
   state.nodesProperties = Object.freeze(result);
 }
 
-function setMappingFilter(state, event) {
+function setMappingOptions(state, event) {
   state.mappingFilter = event;
   // Update datasets.
   const datasets = {};
@@ -245,16 +257,29 @@ function setMappingFilter(state, event) {
     });
   }
   state.filteredDatasets = datasets;
-  // Remove paths as we changed the datasets.
+}
+
+function clearSimilarity(state) {
   state.similarity = emptySimilarity();
 }
 
 function setSimilarity(state, event) {
   state.similarity = {
     "fetched": true,
+    "loading": false,
     "data": event.similarity,
     "datasets": event.datasets,
   };
+}
+
+function setSimilarityLoading(state, event) {
+  state.similarity.loading = event;
+}
+
+function setSimilarityOptions(state, event) {
+  // TODO Check for change in option not delete options unless necessary.
+  state.similarity = emptySimilarity();
+  state.similarityOptions = event;
 }
 
 async function addDatasetAction(context, event) {
@@ -270,7 +295,19 @@ async function addDatasetAction(context, event) {
   context.commit(updateDataset.name, { "id": id, "data": data });
   context.commit(rebuildHierarchy.name);
   context.commit(rebuildNodesProperties.name);
+  context.commit(clearSimilarity.name);
   await fetchLabelsForHierarchy(context, data.hierarchy);
+  // We may need to fetch similarity if we have two datasets.
+  if (Object.values(context.state.datasets).length === 2
+    && context.state.similarityOptions.autoFetch) {
+    const datasets = Object.values(context.state.filteredDatasets);
+    if (datasets[0].loaded && datasets[1].loaded) {
+      await context.dispatch(
+        FETCH_SIMILARITY_ACTION,
+        { "datasets": [datasets[0], datasets[1]] }
+      );
+    }
+  }
 }
 
 async function fetchLabelsForHierarchy(context, hierarchy) {
@@ -299,20 +336,42 @@ function removeDatasetAction(context, event) {
   context.commit(deleteDataset.name, { "id": id });
   context.commit(rebuildHierarchy.name);
   context.commit(rebuildNodesProperties.name);
+  context.commit(clearSimilarity.name);
 }
 
 function setMappingOptionAction(context, event) {
-  context.commit(setMappingFilter.name, event);
+  context.commit(setMappingOptions.name, event);
   context.commit(rebuildNodesProperties.name);
+  context.commit(clearSimilarity.name);
 }
 
-async function setPathOptionsAction(context, event) {
-  const content = await fetchSimilarity(
-    event.options, event.leftDataset, event.rightDataset
-  );
-  // TODO Set auto fetch !
+function setSimilarityOptionsAction(context, event) {
+  context.commit(setSimilarityOptions.name, event);
+  // TODO Make optional if there is no change to data.
+  context.commit(clearSimilarity.name);
+}
+
+async function fetchSimilarityAction(context, event) {
+  if (context.state.similarity.loading) {
+    console.log("Already loading ...");
+    return;
+  }
+  context.commit(setSimilarityLoading.name, true);
+  let content;
+  try {
+    content = await fetchSimilarity(
+      {
+        ...context.state.similarityOptions,
+        "autoFetch": undefined,
+      },
+      event.datasets[0], event.datasets[1]
+    );
+  } catch (error) {
+    context.commit(setSimilarityLoading.name, false);
+    throw error;
+  }
   context.commit(setSimilarity.name, {
     "similarity": content,
-    "datasets": [event.leftDataset.url, event.rightDataset.url],
+    "datasets": [event.datasets[0].url, event.datasets[1].url],
   });
 }

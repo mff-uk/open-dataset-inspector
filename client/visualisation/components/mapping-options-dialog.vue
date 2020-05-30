@@ -42,7 +42,7 @@
 
 <script>
 export default {
-  "name": "mapping-filter-dialog",
+  "name": "mapping-options-dialog",
   "props": {
     "visible": { "type": Boolean, "required": true },
     "options": { "type": Object, "required": true },

@@ -36,7 +36,7 @@
       fab
       dark
       color="blue"
-      content="Open path dialog"
+      content="Open similarity dialog"
       @click="$emit('show-path-dialog')"
     >
       <v-icon dark>
@@ -60,7 +60,7 @@
 
 <script>
 export default {
-  "name": "dialog-menu",
+  "name": "options-menu",
   "data": () => ({
     "showSpeedDial": false,
   }),

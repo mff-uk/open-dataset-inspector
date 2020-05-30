@@ -40,7 +40,7 @@ export function createDefaultPathOptions() : PathOptions {
   return {
     "method": "distance",
     "distance": 2,
-    "autoFetch": false,
+    "autoFetch": true,
   }
 }
 

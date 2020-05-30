@@ -181,22 +181,26 @@ def _expand_level(
 def paths_to_output(
         paths: typing.List[Path], datasets: typing.List[Dataset],
         metadata: typing.Dict = None):
-    path_lends = [len(path.nodes) for path in paths]
+    path_lengths = [len(path.nodes) for path in paths]
 
     if metadata is None:
         metadata = {}
+
+    similarity = {
+        "count": len(paths),
+    }
+    if path_lengths:
+        similarity["max"] = max(path_lengths)
+        similarity["average"] = sum(path_lengths) / len(path_lengths)
+        similarity["sum"] = sum(path_lengths)
+        similarity["min"] = min(path_lengths)
 
     return {
         "metadata": {
             **metadata,
             "datasets": [dataset.id for dataset in datasets],
         },
-        "similarity": {
-            "max": max(path_lends),
-            "average": sum(path_lends) / len(path_lends),
-            "sum": sum(path_lends),
-            "min": min(path_lends)
-        },
+        "similarity": similarity,
         "paths": [
             {
                 "shared": path.shared,
@@ -210,11 +214,10 @@ def paths_to_output(
 
 def select_paths_by_length(paths: typing.List[Path], options) \
         -> typing.List[Path]:
-    """
-    Return all paths shorted than given threshold.
-    Two neighbouring nodes have paths of size 2.
-    """
-    max_length = options.get("distance", 2)
+    """Return all paths shorted than given threshold."""
+    # Two neighbouring nodes have paths of size 2 so we add 2 to make
+    # 0 stand for two nodes next to each other.
+    max_length = options.get("distance", 0) + 2
     return [path for path in paths if len(path.nodes) <= max_length]
 
 

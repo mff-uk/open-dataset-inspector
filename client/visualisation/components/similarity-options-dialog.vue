@@ -6,7 +6,7 @@
     <v-card>
       <v-card-title>
         <span class="headline">
-          Select path
+          Select similarity method
         </span>
       </v-card-title>
       <v-card-text>
@@ -15,7 +15,7 @@
           outlined
           type="error"
         >
-          Paths can be computed only if exactly two datasets are loaded.
+          Similarity can be computed only if exactly two datasets are loaded.
         </v-alert>
         <v-switch
           v-model="local.autoFetch"
@@ -57,7 +57,7 @@
 
 <script>
 export default {
-  "name": "select-path-dialog",
+  "name": "select-options-dialog",
   "props": {
     "visible": { "type": Boolean, "required": true },
     "options": { "type": Object, "required": true },
@@ -91,7 +91,7 @@ export default {
       return [isNotNegativeInteger];
     },
     "canSubmit": function () {
-      return this.datasetCount === 2 && isNotNegativeInteger(this.distance);
+      return isNotNegativeInteger(this.distance);
     },
   },
   "methods": {
@@ -100,9 +100,8 @@ export default {
     },
     "onSubmit": function () {
       this.$emit("accept", {
-        "method": this.local.value,
-        // Distance 2 is for nodes next to each other.
-        "distance": Number.parseInt(this.local.distance, 10) + 2,
+        "method": this.local.method,
+        "distance": Number.parseInt(this.local.distance, 10),
         "autoFetch": this.local.autoFetch,
       });
     },

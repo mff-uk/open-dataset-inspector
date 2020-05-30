@@ -21,11 +21,11 @@
       :left-dataset="datasets[0]"
       :right-dataset="datasets[1]"
       :paths="paths"
-      :activeView="activeView"
+      :active-view="activeView"
     />
     <div style="bottom: 1rem; right: 2.5rem; position: fixed;">
       <v-row>
-        <dialog-menu
+        <options-menu
           @show-mapping-dialog="showMappingDialog = true"
           @show-path-dialog="showPathDialog = true"
           @show-highlight-dialog="showHighlightDialog = true"
@@ -47,9 +47,9 @@
       @accept="changeMappingOptions"
       @reject="showMappingDialog = false"
     />
-    <path-dialog
+    <similarity-dialog
       :visible="showPathDialog"
-      :options="pathOptions"
+      :options="similarityOptions"
       :dataset-count="datasets.length"
       @accept="changePathOptions"
       @reject="showPathDialog = false"
@@ -68,12 +68,13 @@ import { mapGetters } from "vuex";
 
 import NetworkVisualisation from "./network/network-visualisation.vue";
 import AddDatasetDialog from "./components/add-dataset-dialog.vue";
-import MappingFilterDialog from "./components/mapping-filter-dialog.vue";
+import MappingFilterDialog from "./components/mapping-options-dialog.vue";
 import {
   ADD_DATASET,
   REMOVE_DATASET,
   SET_MAPPING_OPTIONS,
-  SET_PATH_OPTIONS,
+  SET_SIMILARITY_OPTIONS,
+  FETCH_SIMILARITY,
   GET_DATASETS,
   GET_LABELS,
   GET_NODES,
@@ -82,17 +83,17 @@ import {
   GET_NODES_PROPERTIES,
   GET_SIMILARITY_AVAILABLE,
   GET_SIMILARITY_PATHS,
+  GET_SIMILARITY_OPTIONS,
 } from "./visualisation-store";
 import { SimilarityVisualisation } from "../similarity-visualisation";
 import {
   createMappingFilters,
   createDefaultMappingOptions,
   createDefaultHighlightFilterOptions,
-  createDefaultPathOptions,
 } from "./visualisation-service.ts";
-import SelectPathDialog from "./components/select-path-dialog.vue";
-import HighlightDialog from "./components/highlight-filter-dialog.vue";
-import DialogMenu from "./components/dialog-menu.vue";
+import SimilarityDialog from "./components/similarity-options-dialog.vue";
+import HighlightDialog from "./components/highlight-options-dialog.vue";
+import OptionsMenu from "./components/options-menu.vue";
 import VisualisationMenu from "./components/visualisation-menu.vue";
 
 export default {
@@ -102,9 +103,9 @@ export default {
     "network-visualisation": NetworkVisualisation,
     "similarity-visualisation": SimilarityVisualisation,
     "mapping-dialog": MappingFilterDialog,
-    "path-dialog": SelectPathDialog,
+    "similarity-dialog": SimilarityDialog,
     "highlight-dialog": HighlightDialog,
-    "dialog-menu": DialogMenu,
+    "options-menu": OptionsMenu,
     "visualisation-menu": VisualisationMenu,
   },
   "data": () => ({
@@ -116,7 +117,6 @@ export default {
     "activeView": 0,
     "mappingOptions": createDefaultMappingOptions(),
     "highlightOptions": createDefaultHighlightFilterOptions(),
-    "pathOptions": createDefaultPathOptions(),
   }),
   "computed": {
     ...mapGetters("hierarchy", {
@@ -128,6 +128,7 @@ export default {
       "nodesProperties": GET_NODES_PROPERTIES,
       "pathsAreAvailable": GET_SIMILARITY_AVAILABLE,
       "paths": GET_SIMILARITY_PATHS,
+      "similarityOptions": GET_SIMILARITY_OPTIONS,
     }),
   },
   "mounted": function () {
@@ -162,12 +163,12 @@ export default {
     "changePathOptions": function (options) {
       this.showPathDialog = false;
       //
-      this.pathOptions = options;
-      this.$store.dispatch(SET_PATH_OPTIONS, {
-        "leftDataset": this.datasets[0],
-        "rightDataset": this.datasets[1],
-        "options": options,
-      });
+      this.$store.dispatch(SET_SIMILARITY_OPTIONS, options);
+      if (this.datasets.length === 2) {
+        this.$store.dispatch(FETCH_SIMILARITY, {
+          "datasets": [this.datasets[0], this.datasets[1]],
+        });
+      }
     },
     "changeHighlightOptions": function (options) {
       this.showHighlightDialog = false;

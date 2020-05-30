@@ -20,7 +20,7 @@ export async function fetchLabels(ids: Array<string>): Promise<object> {
 }
 
 export async function fetchSimilarity(
-  options: string, left: any, right: any) : Promise<Object> {
+  options: any, left: any, right: any) : Promise<Object> {
   const url = "./api/v1/mapping-similarity";
   const form = new FormData();
   form.append("dataset", createDatasetBlob(left));
