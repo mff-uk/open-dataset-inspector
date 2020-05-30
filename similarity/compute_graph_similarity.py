@@ -117,9 +117,9 @@ def _find_path(
         -> typing.List[Path]:
     if left == right:
         return [Path(left, tuple([left]))]
-    left_visited = set()
+    left_visited = {left}
     left_level = {left}
-    right_visited = set()
+    right_visited = {right}
     right_level = {right}
     paths = {left: [left], right: [right]}
 
@@ -186,9 +186,7 @@ def paths_to_output(
     if metadata is None:
         metadata = {}
 
-    similarity = {
-        "count": len(paths),
-    }
+    similarity = { }
     if path_lengths:
         similarity["max"] = max(path_lengths)
         similarity["average"] = sum(path_lengths) / len(path_lengths)
