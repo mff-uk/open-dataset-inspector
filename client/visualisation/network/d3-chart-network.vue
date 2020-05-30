@@ -191,6 +191,10 @@ function updateNetwork(
 }
 
 function updatePositions(svg, simulation, nodes, edges, setComputing) {
+  if (nodes.length === 0) {
+    return;
+  }
+
   const linkElements = svg
     .select("g.lines")
     .selectAll("line")
