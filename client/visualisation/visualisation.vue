@@ -175,12 +175,6 @@ export default {
       //
       this.highlightOptions = options;
     },
-    "onSetLeftDataset": function (url, collection) {
-      console.log("onSetLeftDataset", url, collection);
-    },
-    "onSetRightDataset": function (url, collection) {
-      console.log("onSetRightDataset", url, collection);
-    },
     "changeMappingOptions": function (options) {
       this.showMappingDialog = false;
       //
