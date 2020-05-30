@@ -39,7 +39,7 @@ export function createDefaultHighlightFilterOptions() : HighlightFilterOptions {
 export function createDefaultPathOptions() : PathOptions {
   return {
     "method": "distance",
-    "distance": 2,
+    "distance": 1,
     "autoFetch": true,
   }
 }
