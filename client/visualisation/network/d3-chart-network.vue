@@ -17,13 +17,12 @@
       class="tooltip"
       style="position: absolute; opacity: 0.0; top: 0;"
     >
-      <span v-show="selected.directlyMapped">
-        Directly mapped
+      <span v-show="selected.mappedDirectly">
+        Directly mapped <br>
       </span>
-      <span v-show="!selected.directlyMapped">
-        Reduced
+      <span v-show="selected.mappedByReduce">
+        Reduced <br>
       </span>
-      <br>
       ID:{{ selected.id }} <br>
       Label: {{ selected.label }} <br>
       Tokens: {{ selected.mappedBy }}
@@ -48,7 +47,8 @@ export default {
     "selected": {
       "id": "",
       "label": "",
-      "directlyMapped": false,
+      "mappedDirectly": false,
+      "mappedByReduce": false,
       "node": undefined,
       "mappedBy": "",
     },
@@ -143,12 +143,19 @@ function initializeD3Svg($this, element) {
       "label": $this.labels[item.id],
       "node": nodeProperties,
       "mappedBy": "",
+      "mappedDirectly": false,
+      "mappedByReduce": false,
     };
     if (nodeProperties !== undefined) {
-      $this.selected.directlyMapped = nodeProperties.directlyMapped;
       if (nodeProperties.mappedBy.size > 0) {
         const mappedByStr = Array.from(nodeProperties.mappedBy).join("', '");
         $this.selected.mappedBy = `'${mappedByStr}'`;
+        //
+        if (nodeProperties.directlyMapped) {
+          $this.selected.mappedDirectly = true;
+        } else {
+          $this.selected.mappedByReduce = true;
+        }
       }
     }
   };
@@ -217,12 +224,16 @@ function updatePositions(svg, simulation, nodes, edges, setComputing) {
 
   simulation.restart();
 
+  // We allow setting of positions after the first iteration, to
+  // improve user experience.
+  let firstIteration = true;
   simulation.on("tick", () => {
-    if (simulation.alpha() > UPDATE_ALPHA) {
+    if (!firstIteration && simulation.alpha() > UPDATE_ALPHA) {
       const value = Math.floor((1 - simulation.alpha()) * 100);
       setComputing(true, value);
       return;
     }
+    firstIteration = false;
 
     linkElements
       .attr("x1", (d) => d.source.x)
