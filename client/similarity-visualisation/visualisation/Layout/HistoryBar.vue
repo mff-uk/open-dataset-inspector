@@ -24,12 +24,13 @@
 <script lang="ts">
 import Vue from 'vue'
 import { Getters, Actions, STORE_NAME } from '../Visualisation.store'
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, Store } from 'vuex'
 import { Label } from '../../models'
 
 export default Vue.extend({
   name: 'HistoryBar',
 
+  props: ['activeView'],
   data: () => ({
   }),
   computed: {
@@ -39,10 +40,22 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions(STORE_NAME, {
-      updatePath: Actions.UPDATE_PATH
+      updatePath: Actions.UPDATE_PATH,
+      createHierarchyForCircles: Actions.CREATE_HIERARCHY_FOR_CIRCLES,
+      updateCircleCanvas: Actions.UPDATE_CIRCLE_CANVAS,
+      createHierarchyForTree: Actions.CREATE_HIERARCHY_FOR_TREE,
+      updateTreeCanvas: Actions.UPDATE_TREE_CANVAS
     }),
     click: function (data: Label) {
       this.updatePath(data)
+      if (this.activeView === 1) {
+          this.createHierarchyForCircles()
+          this.updateCircleCanvas()
+      }
+      if (this.activeView === 2) {
+        this.createHierarchyForTree()
+        this.updateTreeCanvas()
+      }
     }
   }
 })

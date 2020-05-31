@@ -41,8 +41,7 @@ export const Mutations = {
   CHANGE_TREE_NODES: 'CHANGE_TREE_NODES',
   CHANGE_TREE_LINKS: 'CHANGE_TREE_LINKS',
   CHANGE_TREE_HEIGHT: 'CHANGE_TREE_HEIGHT',
-  CHANGE_HIERARCHY: 'CHANGE_HIERARCHY',
-  CHANGE_LABELS: 'CHANGE_LABELS'
+  CHANGE_HIERARCHY: 'CHANGE_HIERARCHY'
 }
 
 export const Getters = {
@@ -66,8 +65,7 @@ export const Getters = {
   GET_TREE_HIERARCHY: 'GET_TREE_HIERARCHY',
   GET_TREE_NODES: 'GET_TREE_NODES',
   GET_TREE_LINKS: 'GET_TREE_LINKS',
-  GET_HIERARCHY: 'GET_HIERARCHY',
-  GET_LABELS: 'GET_LABELS'
+  GET_HIERARCHY: 'GET_HIERARCHY'
 }
 
 export default {
@@ -85,7 +83,6 @@ export default {
     rightArrows: Array<Arrow>(),
     rootId: ROOT_ID,
     hierarchy: [],
-    labels: {},
     circleHierarchy: new Node(ROOT_LABEL, Array<Node>(), Array<Node>(), ROOT_ID, 0, undefined, undefined),
     treeHierarchy: new Node(ROOT_LABEL, Array<Node>(), Array<Node>(), ROOT_ID, 0, undefined, undefined),
     treeNodes: Array<Circle>(),
@@ -158,9 +155,6 @@ export default {
     [Getters.GET_TREE_LINKS]: (state: any) => {
       return state.treeLinks
     },
-    [Getters.GET_LABELS]: (state: any) => {
-      return state.labels
-    },
     [Getters.GET_HIERARCHY]: (state: any) => {
       return state.hierarchy
     }
@@ -170,9 +164,7 @@ export default {
       state.activePath = value
     },
     [Mutations.CHANGE_LEFT_MAPPING] (state: any, value: Array<MappingNode>) {
-      console.log('CHANGE_LEFT_MAPPING_STORE')
       state.leftMapping = value
-      console.log('CHANGE_LEFT_MAPPING_STORE_END')
     },
     [Mutations.CHANGE_RIGHT_MAPPING] (state: any, value: Array<MappingNode>) {
       state.rightMapping = value
@@ -229,9 +221,6 @@ export default {
     [Mutations.CHANGE_TREE_LINKS] (state: any, value: Array<Arrow>) {
       state.treeLinks = value
     },
-    [Mutations.CHANGE_LABELS] (state: any, value: {}) {
-      state.labels = value
-    },
     [Mutations.CHANGE_HIERARCHY] (state: any, value: []) {
       state.hierarchy = value
     }
@@ -285,8 +274,6 @@ function selectPath (context: any, labels: any) {
 function updatePath (context: any, value: number) {
   context.commit(Mutations.CHANGE_ROOT_ID, context.state.visitedNodes[value].id)
   context.commit(Mutations.CHANGE_VISITED_NODES, context.state.visitedNodes.slice(0, value + 1))
-  context.dispatch(Actions.CREATE_HIERARCHY_FOR_CIRCLES)
-  context.dispatch(Actions.UPDATE_CIRCLE_CANVAS)
 }
 
 function createHierarchyForCircles (context: any) {
@@ -350,9 +337,7 @@ function createCircles (context: any): Array<Circle> {
 }
 
 function updateCircleCanvas (context: any) {
-  console.log('UPDATE_CIRCLE_CANVAS_START')
   context.commit(Mutations.CHANGE_CIRCLES, createCircles(context))
-  console.log(context.getters[Getters.GET_LEFT_MAPPING])
   context.commit(Mutations.CHANGE_LEFT_ARROWS, packMappingArrows(context.state.window.height, context.state.window.width,
     context.state.circles, createLayer(context.state.leftMapping, context.state.nodes), Position.Left))
   context.commit(Mutations.CHANGE_RIGHT_ARROWS, packMappingArrows(context.state.window.height, context.state.window.width,
@@ -360,8 +345,6 @@ function updateCircleCanvas (context: any) {
   if (context.state.activePath !== undefined) {
     context.commit(Mutations.CHANGE_CIRCLES, highlightPaths(context.state.circles, context.state.activePath))
   }
-  console.log(context.getters[Getters.GET_LEFT_ARROWS])
-  console.log('UPDATE_CIRCLE_CANVAS_END')
 }
 
 function updateTreeCanvas (context: any) {

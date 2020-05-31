@@ -6,7 +6,9 @@
         <v-col cols="8">
           <v-col cols="12">
             <v-row>
-              <History-bar></History-bar>
+              <History-bar
+                v-bind:activeView="this.activeView"
+              ></History-bar>
             </v-row>
             <v-row class="text-center">
               <value-slider></value-slider>
@@ -45,14 +47,13 @@ export default Vue.extend({
     HistoryBar,
     PathBar
   },
-  props: ['rightDataset', 'leftDataset', 'pathsDataset', 'activeView'],
+  props: ['rightDataset', 'leftDataset', 'pathsDataset', 'activeView', 'labels'],
   data: () => ({
     paths: undefined
   }),
   computed: {
     ...mapGetters(STORE_NAME, {
-      nodes: Getters.GET_NODES,
-      labels: Getters.GET_LABELS
+      nodes: Getters.GET_NODES
     })
   },
   watch: {

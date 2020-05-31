@@ -25,9 +25,6 @@ export function createLabels (leftDataset: any, rightDataset: any) {
 }
 
 export function createLayer (urls: Array<MappingNode>, nodes: Array<Node>): Array<ArrowData> {
-  console.log('AAA')
-  console.log(urls)
-  console.log(nodes)
   const layerArray = Array<ArrowData>()
   for (let i = 0; i < urls.length; i++) {
     const n = nodes.filter(y => y.id === urls[i].nodeID)[0]
@@ -68,7 +65,6 @@ export function createLayer (urls: Array<MappingNode>, nodes: Array<Node>): Arra
       }
     }
   }
-  console.log(layerArray)
   return layerArray
 }
 
