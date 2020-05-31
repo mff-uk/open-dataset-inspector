@@ -1,7 +1,13 @@
 import { register } from "../app/register.ts";
-import { default as store, STORE_NAME } from "./visualisation/Visualisation.store.ts";
+import {
+  default as store,
+  STORE_NAME,
+} from "./visualisation/Visualisation.store";
 
-export {default as SimilarityVisualisation} from "./similarity-visualisation.vue";
+export {
+  default as SimilarityVisualisation,
+} from "./similarity-visualisation.vue";
+
 
 register({
   "name": "similarity-visualisation",

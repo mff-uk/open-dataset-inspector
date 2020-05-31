@@ -29,7 +29,7 @@
             >
               <img
                 class="carousel-image"
-                :src="require(`./img/${image}.png`)"
+                :src="`./images/${image}.png`"
                 :alt="titles[index]"
               />
               <div class="carousel-title">

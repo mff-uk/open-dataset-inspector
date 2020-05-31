@@ -2,7 +2,6 @@ import { ROOT_LABEL, ROOT_ID, MAX_DEPTH, MappingNode, Label, Node, Circle, Arrow
 import { createTree, createLayer, getMaxTreeDepth, packMappingArrows, appendNode, createArrayFromHierarchy, highlightTreeMapping } from '../utils/hierarchyUtils'
 import { packNodes, packTreeHierarchy, getNodeByKey, createLabel, getNodeLabel } from '../utils/nodesUtils'
 import { highlightPaths, createPathNodes } from '../utils/pathUtils'
-import { Store } from 'vuex'
 
 export const STORE_NAME = 'Visualisation'
 
