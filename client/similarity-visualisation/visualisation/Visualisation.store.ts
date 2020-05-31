@@ -289,7 +289,15 @@ function createHierarchyForCircles (context: any) {
     } else {
       context.commit(Mutations.CHANGE_CIRCLE_HIERARCHY, createTree(context.state.rootId, context.state.nodes, context.state.depth))
     }
-    context.commit(Mutations.CHANGE_MAX_DEPTH, maxDepth)
+    if (maxDepth === 0) {
+      context.commit(Mutations.CHANGE_MAX_DEPTH, 1)
+      context.commit(Mutations.CHANGE_DEPTH, 1)
+    } else {
+      if (maxDepth < context.state.depth) {
+        context.commit(Mutations.CHANGE_DEPTH, maxDepth)
+      }
+      context.commit(Mutations.CHANGE_MAX_DEPTH, maxDepth)
+    }
   }
 }
 

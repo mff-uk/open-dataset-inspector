@@ -7,11 +7,13 @@
           <v-col cols="12">
             <v-row>
               <History-bar
-                v-bind:activeView="this.activeView"
+                v-bind:activeView="activeView"
               ></History-bar>
             </v-row>
             <v-row class="text-center">
-              <value-slider></value-slider>
+              <value-slider
+                v-if="activeView === 1"
+              ></value-slider>
             </v-row>
             <v-row class="text-center">
               <path-bar

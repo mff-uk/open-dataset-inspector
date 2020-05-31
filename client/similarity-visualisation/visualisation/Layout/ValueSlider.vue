@@ -2,6 +2,7 @@
   <v-container>
     <p>Level of descendants in the view</p>
     <v-slider
+      v-if="minimum !== maximum"
       v-bind:min="minimum"
       v-bind:value="depth"
       v-bind:max="maximum"
