@@ -37,7 +37,7 @@ export default Vue.extend({
     TreeLink,
     TreeLabel
   },
-  props: ['rightDataset', 'leftDataset', 'activeView'],
+  props: ['rightDataset', 'leftDataset', 'activeView', 'labels'],
   data: () => ({
     left: Position.Left,
     right: Position.Right
@@ -46,8 +46,8 @@ export default Vue.extend({
     ...mapGetters(STORE_NAME, {
       circles: Getters.GET_TREE_NODES,
       links: Getters.GET_TREE_LINKS,
-      labels: Getters.GET_LABELS,
-      hierarchy: Getters.GET_HIERARCHY
+      hierarchy: Getters.GET_HIERARCHY,
+      nodes: Getters.GET_NODES
     })
   },
   created () {
@@ -58,7 +58,7 @@ export default Vue.extend({
   },
   mounted () {
     if (this.rightDataset !== undefined || this.leftDataset !== undefined) {
-      this.initLabelsAndNodes()
+      this.initNodes()
     }
     this.resizeCanvas({
       // @ts-ignore
@@ -101,8 +101,7 @@ export default Vue.extend({
       changeLeftMapping: Mutations.CHANGE_LEFT_MAPPING,
       changeRightMapping: Mutations.CHANGE_RIGHT_MAPPING,
       changeNodes: Mutations.CHANGE_NODES,
-      changeHierarchy: Mutations.CHANGE_HIERARCHY,
-      changeLabels: Mutations.CHANGE_LABELS
+      changeHierarchy: Mutations.CHANGE_HIERARCHY
     }),
     updateVisualisation: function () {
       this.createHierarchyForTree()
@@ -124,8 +123,7 @@ export default Vue.extend({
         this.cutChildren(item)
       }
     },
-    initLabelsAndNodes: function () {
-      this.changeLabels(createLabels(this.leftDataset, this.rightDataset))
+    initNodes: function () {
       this.changeHierarchy(createHierarchy(this.leftDataset, this.rightDataset))
       this.changeNodes(createNodes(this.hierarchy, this.labels))
     }

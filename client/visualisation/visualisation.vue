@@ -21,6 +21,7 @@
       :left-dataset="datasets[0]"
       :right-dataset="datasets[1]"
       :paths="paths"
+      :labels="labels"
       :active-view="activeView"
     />
     <div style="bottom: 1rem; right: 2.5rem; position: fixed;">

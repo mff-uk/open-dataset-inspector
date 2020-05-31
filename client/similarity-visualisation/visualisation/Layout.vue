@@ -45,14 +45,13 @@ export default Vue.extend({
     HistoryBar,
     PathBar
   },
-  props: ['rightDataset', 'leftDataset', 'pathsDataset', 'activeView'],
+  props: ['rightDataset', 'leftDataset', 'pathsDataset', 'activeView', 'labels'],
   data: () => ({
     paths: undefined
   }),
   computed: {
     ...mapGetters(STORE_NAME, {
-      nodes: Getters.GET_NODES,
-      labels: Getters.GET_LABELS
+      nodes: Getters.GET_NODES
     })
   },
   watch: {

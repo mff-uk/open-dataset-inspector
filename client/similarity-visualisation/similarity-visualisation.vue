@@ -5,12 +5,14 @@
         v-bind:leftDataset="leftDataset"
         v-bind:rightDataset="rightDataset"
         v-bind:activeView="activeView"
+        v-bind:labels="labels"
       />
     </v-row>
     <layout
       v-bind:pathsDataset="paths"
       v-bind:leftDataset="leftDataset"
       v-bind:rightDataset="rightDataset"
+      v-bind:labels="labels"
       v-bind:activeView="activeView"
     />
   </div>
@@ -30,7 +32,8 @@ export default {
     "leftDataset": Object,
     "rightDataset": Object,
     "paths": Array,
-    "activeView": Number
+    "activeView": Number,
+    "labels": Object
   }
 }
 </script>

@@ -50,7 +50,7 @@ export default Vue.extend({
     CircleLabel,
     CircleLink
   },
-  props: ['rightDataset', 'leftDataset'],
+  props: ['rightDataset', 'leftDataset', 'labels'],
   data: () => ({
     left: Position.Left,
     right: Position.Right
@@ -60,7 +60,6 @@ export default Vue.extend({
       circles: Getters.GET_CIRCLES,
       leftArrows: Getters.GET_LEFT_ARROWS,
       rightArrows: Getters.GET_RIGHT_ARROWS,
-      labels: Getters.GET_LABELS,
       hierarchy: Getters.GET_HIERARCHY,
       nodes: Getters.GET_NODES
     })
@@ -73,7 +72,7 @@ export default Vue.extend({
   },
   mounted () {
     if (this.rightDataset !== undefined || this.leftDataset !== undefined) {
-      this.initLabelsAndNodes()
+      this.initNodes()
     }
     
     this.resizeCanvas({
@@ -116,8 +115,7 @@ export default Vue.extend({
       changeLeftMapping: Mutations.CHANGE_LEFT_MAPPING,
       changeRightMapping: Mutations.CHANGE_RIGHT_MAPPING,
       changeNodes: Mutations.CHANGE_NODES,
-      changeHierarchy: Mutations.CHANGE_HIERARCHY,
-      changeLabels: Mutations.CHANGE_LABELS
+      changeHierarchy: Mutations.CHANGE_HIERARCHY
     }),
     updateVisualisation: function () {
       this.createHierarchyForCircles()
@@ -138,8 +136,7 @@ export default Vue.extend({
       this.createHierarchyForCircles()
       this.updateCircleCanvas()
     },
-    initLabelsAndNodes: function () {
-      this.changeLabels(createLabels(this.leftDataset, this.rightDataset))
+    initNodes: function () {
       this.changeHierarchy(createHierarchy(this.leftDataset, this.rightDataset))
       this.changeNodes(createNodes(this.hierarchy, this.labels))
     }

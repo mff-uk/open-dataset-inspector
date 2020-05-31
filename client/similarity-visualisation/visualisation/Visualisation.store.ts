@@ -41,8 +41,7 @@ export const Mutations = {
   CHANGE_TREE_NODES: 'CHANGE_TREE_NODES',
   CHANGE_TREE_LINKS: 'CHANGE_TREE_LINKS',
   CHANGE_TREE_HEIGHT: 'CHANGE_TREE_HEIGHT',
-  CHANGE_HIERARCHY: 'CHANGE_HIERARCHY',
-  CHANGE_LABELS: 'CHANGE_LABELS'
+  CHANGE_HIERARCHY: 'CHANGE_HIERARCHY'
 }
 
 export const Getters = {
@@ -66,8 +65,7 @@ export const Getters = {
   GET_TREE_HIERARCHY: 'GET_TREE_HIERARCHY',
   GET_TREE_NODES: 'GET_TREE_NODES',
   GET_TREE_LINKS: 'GET_TREE_LINKS',
-  GET_HIERARCHY: 'GET_HIERARCHY',
-  GET_LABELS: 'GET_LABELS'
+  GET_HIERARCHY: 'GET_HIERARCHY'
 }
 
 export default {
@@ -85,7 +83,6 @@ export default {
     rightArrows: Array<Arrow>(),
     rootId: ROOT_ID,
     hierarchy: [],
-    labels: {},
     circleHierarchy: new Node(ROOT_LABEL, Array<Node>(), Array<Node>(), ROOT_ID, 0, undefined, undefined),
     treeHierarchy: new Node(ROOT_LABEL, Array<Node>(), Array<Node>(), ROOT_ID, 0, undefined, undefined),
     treeNodes: Array<Circle>(),
@@ -158,9 +155,6 @@ export default {
     [Getters.GET_TREE_LINKS]: (state: any) => {
       return state.treeLinks
     },
-    [Getters.GET_LABELS]: (state: any) => {
-      return state.labels
-    },
     [Getters.GET_HIERARCHY]: (state: any) => {
       return state.hierarchy
     }
@@ -228,9 +222,6 @@ export default {
     },
     [Mutations.CHANGE_TREE_LINKS] (state: any, value: Array<Arrow>) {
       state.treeLinks = value
-    },
-    [Mutations.CHANGE_LABELS] (state: any, value: {}) {
-      state.labels = value
     },
     [Mutations.CHANGE_HIERARCHY] (state: any, value: []) {
       state.hierarchy = value

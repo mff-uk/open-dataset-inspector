@@ -14,11 +14,13 @@
         <circle-visualisation
           v-bind:leftDataset="leftDataset"
           v-bind:rightDataset="rightDataset"
+          v-bind:labels="labels"
           v-if="activeView === 1"
         ></circle-visualisation>
         <tree-visualisation
           v-bind:leftDataset="leftDataset"
           v-bind:rightDataset="rightDataset"
+          v-bind:labels="labels"
           v-if="activeView === 2"
         ></tree-visualisation>
       </v-col>
@@ -53,7 +55,7 @@ export default Vue.extend({
     CircleVisualisation,
     TreeVisualisation
   },
-  props: ['rightDataset', 'leftDataset', 'activeView'],
+  props: ['rightDataset', 'leftDataset', 'activeView', 'labels'],
   data: () => ({
     left: Position.Left,
     right: Position.Right,
@@ -62,7 +64,6 @@ export default Vue.extend({
   }),
   computed: {
     ...mapGetters(STORE_NAME, {
-      labels: Getters.GET_LABELS,
       hierarchy: Getters.GET_HIERARCHY
     })
   },
