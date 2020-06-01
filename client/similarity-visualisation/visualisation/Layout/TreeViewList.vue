@@ -22,7 +22,7 @@ export default Vue.extend({
   },
   methods: {
     // eslint-disable-next-line
-    selectedChanged: function (data: any): void {
+    selectedChanged: function (data: [number]): void {
       const array = Array<MappingNode>()
       const tmpArray: Array<MappingNode> = this.items
       tmpArray.forEach(element => {
@@ -33,7 +33,7 @@ export default Vue.extend({
         }
       })
       const result = Array<MappingNode>()
-      data.forEach((element: any) => {
+      data.forEach((element: number) => {
         const node = array.filter(x => x.id === element)[0]
         if (node !== undefined) {
           result.push(node)

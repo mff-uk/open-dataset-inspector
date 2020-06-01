@@ -40,9 +40,9 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapActions, mapMutations, mapGetters } from 'vuex'
-import { Position, MappingNode, ROOT_ID, ROOT_LABEL } from '../models'
+import { Position, MappingNode, ROOT_ID, ROOT_LABEL, ComboboxItem } from '../models'
 import { Actions, Mutations, Getters, STORE_NAME } from './Visualisation.store'
-import { addMappingItemToArray, createNodes, createLabel } from '../utils/nodesUtils'
+import { addMappingItemToArray, createNodes, createVisitedNode } from '../utils/nodesUtils'
 import { createMapping, createLabels, createHierarchy } from '../utils/hierarchyUtils'
 import SideBar from './Layout/SideBar.vue'
 import CircleVisualisation from './CircleVisualisation/CircleVisualisation.vue'
@@ -123,7 +123,7 @@ export default Vue.extend({
     initializeVisualisation: function () {
       this.changeRootId(ROOT_ID)
       this.changeActivePath(undefined)
-      this.changeVisitedNodes([createLabel(ROOT_ID, ROOT_LABEL)])
+      this.changeVisitedNodes([createVisitedNode(ROOT_ID, ROOT_LABEL)])
       this.initPathNodes()
     },
     updateVisualisation: function () {
@@ -144,7 +144,7 @@ export default Vue.extend({
           break
       }
     },
-    mappingChanged: function (position: Position, array: any) {
+    mappingChanged: function (position: Position, array: Array<MappingNode>) {
       switch (position) {
         case Position.Left:
           this.changeLeftMapping(array)
@@ -156,8 +156,8 @@ export default Vue.extend({
       this.updateVisualisation()
     },
     updateMappingsCombobox: function (dataset: any, position: Position) {
-      const result: any = []
-      dataset.mappings.forEach((element: any, i: number) => {
+      const result: Array<ComboboxItem> = []
+      dataset.mappings.forEach((element: {data: [], metadata: {from: string, title: string, input: []}}, i: number) => {
         addMappingItemToArray(result, element, i)
       })
       switch (position) {

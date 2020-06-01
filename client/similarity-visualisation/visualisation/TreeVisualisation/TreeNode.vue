@@ -20,6 +20,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { Circle } from '../../models'
 
 export default Vue.extend({
   name: 'TreeNode',
@@ -35,11 +36,11 @@ export default Vue.extend({
   },
   methods: {
     /** @param {MouseEvent} event */
-    emit (event: any) {
+    emit (event: Circle) {
       this.$emit('nodeClicked', event)
     },
     // eslint-disable-next-line
-    openWiki: function (data: any) {
+    openWiki: function (data: Circle) {
       const win = window.open('https://www.wikidata.org/wiki/' + data.id, '_blank')
       if (win !== null) {
         win.focus()

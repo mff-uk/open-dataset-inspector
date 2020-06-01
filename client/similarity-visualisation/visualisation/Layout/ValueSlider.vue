@@ -42,7 +42,7 @@ export default Vue.extend({
       updateCircleCanvas: Actions.UPDATE_CIRCLE_CANVAS
     }),
     // eslint-disable-next-line
-    handleDepthChange: function (data: any) {
+    handleDepthChange: function (data: number) {
       this.changeDepth(data)
       this.createHierarchyForCircles()
       this.updateCircleCanvas()

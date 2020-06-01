@@ -29,8 +29,8 @@ export default Vue.extend({
       const lefty: number = this.linkData.ly
       const rightx: number = this.linkData.rx
       const righty: number = this.linkData.ry
-      const left: any = [leftx, lefty]
-      const right: any = [rightx, righty]
+      const left: [number, number] = [leftx, lefty]
+      const right: [number, number] = [rightx, righty]
       return d3.linkVertical()({
         // @ts-ignore
         source: left,

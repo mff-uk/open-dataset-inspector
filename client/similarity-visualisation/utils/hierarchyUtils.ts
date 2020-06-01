@@ -1,8 +1,7 @@
-import { MappingNode, Node, ArrowData, ROOT_ID, Circle, Arrow, Position, Label, MappingData, MAX_TREE_DEPTH } from '../models'
+import { MappingNode, Node, ArrowData, ROOT_ID, Circle, Arrow, Position, Labels, MappingData, MAX_TREE_DEPTH } from '../models'
 import { getNodeById, getNodeLabel } from './nodesUtils'
 
-
-export function createHierarchy (leftDataset: any, rightDataset: any) {
+export function createHierarchy (leftDataset: {hierarchy: [string, string, string]}, rightDataset: {hierarchy: [string, string, string]}) {
   let hierarchyArray: any = []
   if (leftDataset !== undefined) {
     hierarchyArray = hierarchyArray.concat(leftDataset.hierarchy)
@@ -13,8 +12,8 @@ export function createHierarchy (leftDataset: any, rightDataset: any) {
   return hierarchyArray
 }
 
-export function createLabels (leftDataset: any, rightDataset: any) {
-  let labelsArray = {}
+export function createLabels (leftDataset: {labels: Labels}, rightDataset: {labels: Labels}) {
+  let labelsArray: Labels = {}
   if (leftDataset !== undefined) {
     labelsArray = { ...labelsArray, ...leftDataset.labels }
   }
@@ -313,7 +312,7 @@ function createMappingNodeWithMap (id: number, name: string, mapBy: string, node
 }
 
 // eslint-disable-next-line
-export function createMapping (labels: Array<Label>, mapping: any, mappingID: number) {
+export function createMapping (labels: Labels, mapping: any, mappingID: number) {
   const result = Array<MappingNode>()
   const mappingDataArray = Array<MappingData>()
   mapping.mappings[mappingID].data.forEach((item: any) => {

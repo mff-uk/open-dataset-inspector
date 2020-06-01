@@ -1,5 +1,5 @@
 <template>
-  <svg id="svg" ref="svg" width="100%" height="50vh">
+  <svg id="svg" ref="svg" width="100%" height="90vh">
     <defs>
       <!-- arrowhead marker definition -->
       <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5"
@@ -40,7 +40,7 @@ import CircleLink from './CircleLink.vue'
 import { mapGetters, mapActions, mapMutations } from 'vuex'
 import { ROOT_ID, ROOT_LABEL, Position, Circle } from '../../models'
 import { Getters, Actions, Mutations, STORE_NAME } from '../Visualisation.store'
-import { createNodes, createLabel } from '../../utils/nodesUtils'
+import { createNodes } from '../../utils/nodesUtils'
 import { createLabels, createHierarchy } from '../../utils/hierarchyUtils'
 
 export default Vue.extend({

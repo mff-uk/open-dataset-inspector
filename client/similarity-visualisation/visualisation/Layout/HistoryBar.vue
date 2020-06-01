@@ -25,7 +25,7 @@
 import Vue from 'vue'
 import { Getters, Actions, STORE_NAME } from '../Visualisation.store'
 import { mapGetters, mapActions, Store } from 'vuex'
-import { Label } from '../../models'
+import { VisitedNode } from '../../models/VisitedNode'
 
 export default Vue.extend({
   name: 'HistoryBar',
@@ -46,7 +46,7 @@ export default Vue.extend({
       createHierarchyForTree: Actions.CREATE_HIERARCHY_FOR_TREE,
       updateTreeCanvas: Actions.UPDATE_TREE_CANVAS
     }),
-    click: function (data: Label) {
+    click: function (data: VisitedNode) {
       this.updatePath(data)
       if (this.activeView === 1) {
           this.createHierarchyForCircles()

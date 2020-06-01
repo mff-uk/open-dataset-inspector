@@ -20,6 +20,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { Circle } from '../../models'
 
 export default Vue.extend({
   name: 'CircleNode',
@@ -35,12 +36,12 @@ export default Vue.extend({
   },
   methods: {
     /** @param {MouseEvent} event */
-    emit (event: any) {
-      this.$emit('nodeClicked', event)
+    emit (circle: Circle) {
+      this.$emit('nodeClicked', circle)
     },
     // eslint-disable-next-line
-    openWiki: function (data: any) {
-      const win = window.open('https://www.wikidata.org/wiki/' + data.id, '_blank')
+    openWiki: function (circle: Circle) {
+      const win = window.open('https://www.wikidata.org/wiki/' + circle.id, '_blank')
       if (win !== null) {
         win.focus()
       }
