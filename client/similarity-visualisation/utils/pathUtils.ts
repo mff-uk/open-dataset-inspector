@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import { Node, Circle, Path, Label } from '../models'
+import { Node, Circle, Path, Labels } from '../models'
 import { getNodeById, getNodeLabel } from './nodesUtils'
 
 export function createPathNodes (nodes: Array<Node>, activePath: Path) {
@@ -18,7 +18,7 @@ export function createPathNodes (nodes: Array<Node>, activePath: Path) {
 }
 
 // eslint-disable-next-line
-export function createPaths (nodes: Array<Node>, paths: any, labels: Array<Label>): Array<Path> {
+export function createPaths (nodes: Array<Node>, paths: any, labels: Labels): Array<Path> {
   const array = new Array<Path>()
   for (let i = 0; i < paths.length; i++) {
     const from = getNodeLabel(labels, paths[i].nodes[0])
