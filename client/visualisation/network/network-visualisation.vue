@@ -256,7 +256,7 @@ export default {
     "onVisibilityChange": function (mapping) {
       // TODO Only toggle those from mapping.
       this.highlight = createHighlights(
-        this.mappings, this.highlightOptions, this.paths
+        this.mappings, this.highlightOptions, getPaths(this.similarity)
       );
     },
   },
