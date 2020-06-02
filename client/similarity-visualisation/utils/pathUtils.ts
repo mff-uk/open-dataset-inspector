@@ -4,7 +4,7 @@ import { getNodeById, getNodeLabel } from './nodesUtils'
 
 export function createPathNodes (nodes: Array<Node>, activePath: Path) {
   const pathNodes = Array<Node>()
-  const pathColor = function (i: number) { return d3.interpolateOrRd(i / activePath.height) }
+  const pathColor = function (i: number) { return d3.interpolateOrRd((i + 1) / (activePath.height + 1)) }
 
   for (let i = 0; i < activePath.vertices.length; i++) {
     const node: Node = getNodeById(nodes, activePath.vertices[i])
@@ -18,7 +18,8 @@ export function createPathNodes (nodes: Array<Node>, activePath: Path) {
 }
 
 // eslint-disable-next-line
-export function createPaths (nodes: Array<Node>, paths: any, labels: Labels): Array<Path> {
+export function createPaths (nodes: Array<Node>, paths: any, labels: Labels,
+    leftLabels: {[key: string]: string[]}, rightLabels: {[key: string]: string[]}): Array<Path> {
   const array = new Array<Path>()
   for (let i = 0; i < paths.length; i++) {
     const from = getNodeLabel(labels, paths[i].nodes[0])
@@ -51,14 +52,36 @@ export function createPaths (nodes: Array<Node>, paths: any, labels: Labels): Ar
     } else {
       height = down
     }
-    array.push(new Path(from, to, vertices, up, down, height, arrows))
+
+    // let labelsArray: {[key: string]: string[]} = {}
+    // if (leftLabels !== undefined) {
+    //   labelsArray = { ...labelsArray, ...leftLabels }
+    // }
+    // if (rightLabels !== undefined) {
+    //   labelsArray = { ...labelsArray, ...rightLabels }
+    // }
+
+    let leftKeywords: string = ''
+    let rightKeywords: string = ''
+    if (leftLabels[paths[i].nodes[0]] !== undefined) {
+      leftLabels[paths[i].nodes[0]].forEach((item: string) => {
+        leftKeywords += (item + " ")
+      })
+    }
+    if (rightLabels[paths[i].nodes[paths[i].nodes.length - 1]] !== undefined) {
+      rightLabels[paths[i].nodes[paths[i].nodes.length - 1]].forEach((item: string) => {
+        rightKeywords += (item + ", ")
+      })
+    }
+    array.push(new Path(from, to, vertices, up,
+      down, height, arrows, leftKeywords, rightKeywords))
   }
   return array
 }
 
 export function highlightPaths (circles: Array<Circle>, activePath: Path) {
   if (activePath !== undefined) {
-    const pathColor = function (i: number) { return d3.interpolateOrRd(i / activePath.height) }
+    const pathColor = function (i: number) { return d3.interpolateOrRd((i + 1) / (activePath.height + 1)) }
     for (let i = 0; i < activePath.vertices.length; i++) {
       const circle: Circle = circles.filter(y => y.id === activePath.vertices[i])[0]
       const number = Math.abs(i - activePath.up)

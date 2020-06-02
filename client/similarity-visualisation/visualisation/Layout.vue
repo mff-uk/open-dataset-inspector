@@ -5,12 +5,10 @@
         </v-col>
         <v-col cols="8">
           <v-col cols="12">
-            <v-row>
-              <History-bar
-                v-if="historyBarVisible"
-                v-bind:activeView="activeView"
-              ></History-bar>
-            </v-row>
+            <History-bar
+              v-if="historyBarVisible"
+              v-bind:activeView="activeView"
+            ></History-bar>
             <v-row class="text-center">
               <value-slider
                 v-if="activeView === 1"
@@ -43,6 +41,7 @@ import { mapActions, mapMutations, mapGetters } from 'vuex'
 import { ROOT_LABEL, ROOT_ID, MAX_TREE_DEPTH } from '../models'
 import { createVisitedNode } from '../utils/nodesUtils'
 import { createPaths } from '../utils/pathUtils'
+import { createPathLabels } from '../utils/hierarchyUtils'
 
 export default Vue.extend({
   name: 'Layout',
@@ -54,7 +53,9 @@ export default Vue.extend({
   props: ['rightDataset', 'leftDataset', 'pathsDataset', 'activeView', 'labels'],
   data: () => ({
     paths: undefined,
-    historyBarVisible: true
+    historyBarVisible: true,
+    leftPathLabels: undefined,
+    rightPathLabels: undefined
   }),
   computed: {
     ...mapGetters(STORE_NAME, {
@@ -101,35 +102,47 @@ export default Vue.extend({
       changeRightMapping: Mutations.CHANGE_RIGHT_MAPPING
     }),
     updatePaths: function () {
+      if (this.activePath !== undefined) {
+        this.changeActivePath(undefined)
+        this.changePathNodes([])
+        this.changeRootId(ROOT_ID)
+        this.changeVisitedNodes([createVisitedNode(ROOT_ID, ROOT_LABEL)])
+        switch (this.activeView) {
+        case 1:
+          this.createHierarchyForCircles()
+          this.updateCircleCanvas()
+          break
+        case 2:
+          this.createHierarchyForTree(this.activePath.height)
+          this.updateTreeCanvas()
+          break
+        }
+      }
       this.historyBarVisible = true
       if (this.pathsDataset !== undefined) {
         this.pathsVisible = true
-        this.paths = createPaths(this.nodes, this.pathsDataset, this.labels)
+        this.leftPathLabels = createPathLabels(this.leftDataset)
+        this.rightPathLabels = createPathLabels(this.rightDataset)
+        this.paths = createPaths(this.nodes, this.pathsDataset, this.labels,
+          this.leftPathLabels, this.rightPathLabels)
       }
-      this.changeActivePath(undefined)
     },
     cancelClicked: function () {
-      this.historyBarVisible = true
       this.changeLeftMapping([])
       this.changeRightMapping([])
       this.changeRootId(ROOT_ID)
       this.changeVisitedNodes([createVisitedNode(ROOT_ID, ROOT_LABEL)])
       this.changePathNodes([])
       this.changeActivePath(undefined)
-      switch (this.activeView) {
-        case 1:
-          this.createHierarchyForCircles()
-          this.updateCircleCanvas()
-          break
-        case 2:
-          this.createHierarchyForTree(MAX_TREE_DEPTH)
-          this.updateTreeCanvas()
-          break
-      }
     },
     pathUpdated: function () {
-      this.historyBarVisible = false
-      this.selectPath(this.labels)
+      this.$emit('pathUpdated')
+      if (this.activePath !== undefined) {
+        this.historyBarVisible = false
+        this.selectPath(this.labels)
+      } else {
+        this.historyBarVisible = true
+      }      
       switch (this.activeView) {
         case 1:
           this.createHierarchyForCircles()

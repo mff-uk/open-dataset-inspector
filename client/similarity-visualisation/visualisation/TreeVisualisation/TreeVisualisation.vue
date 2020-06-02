@@ -90,6 +90,7 @@ export default Vue.extend({
         // // @ts-ignore
         // const y = this.circles[0].y + 100
         // console.log("transform", "translate(-"+ x +", -"+ y +")scale(1)")
+        
         d3.select('#svg')
           .transition()
           .duration(750)

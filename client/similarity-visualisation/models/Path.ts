@@ -6,9 +6,12 @@ export class Path {
   down: number;
   height: number;
   arrows: Array<string>;
+  leftKeywords: string;
+  rightKeywords: string;
 
   constructor (from: string, to: string, vertices: Array<string>,
-    up: number, down: number, height: number, arrows: Array<string>) {
+    up: number, down: number, height: number, arrows: Array<string>,
+    leftKeywords: string, rightKeywords: string) {
     this.from = from
     this.to = to
     this.vertices = vertices
@@ -16,5 +19,7 @@ export class Path {
     this.down = down
     this.height = height
     this.arrows = arrows
+    this.leftKeywords = leftKeywords
+    this.rightKeywords = rightKeywords
   }
 }

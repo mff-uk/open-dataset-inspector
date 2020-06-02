@@ -1,5 +1,5 @@
 <template>
-  <v-content class="text-center">
+  <v-content fluid height class="text-center">
     <p>Visited nodes</p>
     <template v-for="(c, index) in visitedNodes">
       <v-btn

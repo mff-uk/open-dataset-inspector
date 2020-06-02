@@ -1,34 +1,46 @@
 <template>
-  <svg id="svg" ref="svg" width="100%" height="90vh">
-    <defs>
-      <!-- arrowhead marker definition -->
-      <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5"
-          markerWidth="6" markerHeight="6"
-          orient="auto-start-reverse">
-        <path d="M 0 0 L 10 5 L 0 10 z" />
-      </marker>
-    </defs>
-    <g>
-      <template v-for="(c, index) in circles">
-        <circle-node @nodeClicked='circleClicked' v-bind:key="index" v-bind:nodeData="c"></circle-node>
-      </template>
-    </g>
-    <g>
-      <template v-for="(c, index) in circles">
-        <circle-label @labelClicked='circleClicked' v-bind:key="index" v-bind:labelData="c"></circle-label>
-      </template>
-    </g>
-    <g>
-      <template v-for="(c, index) in leftArrows">
-        <circle-link v-bind:key="index" v-bind:linkData="c"></circle-link>
-      </template>
-    </g>
-    <g>
-      <template v-for="(c, index) in rightArrows">
-        <circle-link v-bind:key="index" v-bind:linkData="c"></circle-link>
-      </template>
-    </g>
-  </svg>
+  <v-container fluid>
+      <v-btn
+        color="green"
+        absolute
+        dark
+        fab
+        small
+        @click="center"
+      >
+        <v-icon>mdi-image-filter-center-focus-strong-outline</v-icon>
+      </v-btn>
+    <svg id="svg" ref="svg" width="100%" height="90vh">
+      <defs>
+        <!-- arrowhead marker definition -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5"
+            markerWidth="6" markerHeight="6"
+            orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+      <g>
+        <template v-for="(c, index) in circles">
+          <circle-node @nodeClicked='circleClicked' v-bind:key="index" v-bind:nodeData="c"></circle-node>
+        </template>
+      </g>
+      <g>
+        <template v-for="(c, index) in circles">
+          <circle-label @labelClicked='circleClicked' v-bind:key="index" v-bind:labelData="c"></circle-label>
+        </template>
+      </g>
+      <g>
+        <template v-for="(c, index) in leftArrows">
+          <circle-link v-bind:key="index" v-bind:linkData="c"></circle-link>
+        </template>
+      </g>
+      <g>
+        <template v-for="(c, index) in rightArrows">
+          <circle-link v-bind:key="index" v-bind:linkData="c"></circle-link>
+        </template>
+      </g>
+    </svg>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -82,7 +94,7 @@ export default Vue.extend({
     })
     this.updateVisualisation()
 
-        const g = d3.selectAll('g')
+    const g = d3.selectAll('g')
 
     /* eslint-disable no-undef */
     // @ts-ignore
@@ -137,6 +149,24 @@ export default Vue.extend({
     initNodes: function () {
       this.changeHierarchy(createHierarchy(this.leftDataset, this.rightDataset))
       this.changeNodes(createNodes(this.hierarchy, this.labels))
+    },
+    zoomed: function () {
+      d3.selectAll('g')
+        .attr("transform", d3.event.transform)
+    },
+    center: function () {
+      const zoom = d3.zoom().on("zoom", this.zoomed)
+        // // @ts-ignore
+        // const x = this.circles[0].x + 100
+        // // @ts-ignore
+        // const y = this.circles[0].y + 100
+        // console.log("transform", "translate(-"+ x +", -"+ y +")scale(1)")
+        
+        d3.select('#svg')
+          .transition()
+          .duration(750)
+          // @ts-ignore
+          .call(zoom.transform, d3.zoomIdentity);
     }
   }
 })

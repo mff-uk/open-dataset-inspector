@@ -287,15 +287,6 @@ export function highlightTreeMapping (circles: Array<Circle>, leftMappingNodes: 
   }
 }
 
-function createMappingData (id: string, group: string, size: number, shared: number) {
-  return new MappingData(
-    id,
-    group,
-    shared,
-    size
-  )
-}
-
 function createMappingNodeWithChildren (id: number, name: string, children: MappingNode[]) {
   const newNode: MappingNode = {
     id: id,
@@ -315,10 +306,27 @@ function createMappingNodeWithMap (id: number, name: string, mapBy: string, node
   return newNode
 }
 
+export function createPathLabels (mapping: any) {
+  const mapArray: {[key: string]: string[]} = {}
+  let datas: any = []
+  mapping.mappings.forEach((element: any) => {
+    datas = datas.concat(element.data)
+  });
+  datas.forEach((item: any) => {
+    item.metadata.group.forEach((element: string) => {
+      if (mapArray[item.id] === undefined) {
+        mapArray[item.id] = Array<string>()
+      }
+      mapArray[item.id].push(element)
+    });
+  })
+  return mapArray
+}
+
 // eslint-disable-next-line
 export function createMapping (labels: Labels, mapping: any, mappingID: number) {
   const result = Array<MappingNode>()
-  const mappingDataArray = Array<MappingData>()
+  const mapArray: {[key: string]: string[]} = {}
   let datas: any = []
   if (mappingID >= mapping.mappings.length) {
     mapping.mappings.forEach((element: any) => {
@@ -327,26 +335,26 @@ export function createMapping (labels: Labels, mapping: any, mappingID: number) 
   } else {
     datas = mapping.mappings[mappingID].data
   }
+
   datas.forEach((item: any) => {
-    mappingDataArray.push(createMappingData(item.id, item.metadata.group, item.metadata.size, item.metadata.shared))
+    const name: string = item.id
+    item.metadata.group.forEach((element: string) => {
+      if (mapArray[element] === undefined) {
+        mapArray[element] = Array<string>()
+      }
+      mapArray[element].push(name)
+    });
   })
   let counter = 1
-  mappingDataArray.forEach(element => {
-    const name = getNodeLabel(labels, element.id)
-    if (result.filter(x => x.name === element.group[0]).length === 0) {
-      const newChildren = createMappingNodeWithMap(counter, name, element.group[0], element.id)
-      counter++
-      const newNode = createMappingNodeWithChildren(counter, element.group[0], [newChildren])
-      counter++
-      result.push(newNode)
-    } else {
-      const node = result.filter(x => x.name === element.group[0])[0]
-      const newChildren = createMappingNodeWithMap(counter, name, element.group[0], element.id)
-      counter++
-      if (node.children !== undefined) {
-        node.children.push(newChildren)
-      }
-    }
-  })
+  for (const item in mapArray) {
+    const nodes = mapArray[item]
+    const mappingNodes: Array<MappingNode> = []
+    const rootName = getNodeLabel(labels, item)
+    nodes.forEach((element: string) => {
+      const name = getNodeLabel(labels, element)
+      mappingNodes.push(createMappingNodeWithMap(counter++, name, item, element))
+    })
+    result.push(createMappingNodeWithChildren(counter++, item, mappingNodes))
+  }
   return result
 }
