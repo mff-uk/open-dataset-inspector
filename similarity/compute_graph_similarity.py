@@ -182,7 +182,7 @@ def paths_to_output(
         paths: typing.List[Path], datasets: typing.List[Dataset],
         metadata: typing.Dict = None):
     # Subtract 2 for start and end node.
-    path_lengths = [len(path.nodes) - 2 for path in paths]
+    path_lengths = [max(len(path.nodes) - 2, 0) for path in paths]
 
     if metadata is None:
         metadata = {}
