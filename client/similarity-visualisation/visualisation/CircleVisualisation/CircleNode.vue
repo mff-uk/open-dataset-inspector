@@ -35,11 +35,9 @@ export default Vue.extend({
   computed: {
   },
   methods: {
-    /** @param {MouseEvent} event */
     emit (circle: Circle) {
       this.$emit('nodeClicked', circle)
     },
-    // eslint-disable-next-line
     openWiki: function (circle: Circle) {
       const win = window.open('https://www.wikidata.org/wiki/' + circle.id, '_blank')
       if (win !== null) {

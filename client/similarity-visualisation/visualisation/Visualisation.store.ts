@@ -244,10 +244,8 @@ function initPathNodes (context: any) {
   context.commit(Mutations.CHANGE_PATH_NODES, Array<Node>())
 }
 
-// UPRAVIT KOD
 function selectPath (context: any, labels: Labels) {
   const activePath: Path = context.getters[Getters.GET_ACTIVE_PATH]
-  // const nodes: Array<Node> = context.getters[Getters.GET_NODES]
   const rootId: string = activePath.vertices[activePath.up]
   const leftLabel = getNodeLabel(labels, activePath.vertices[0])
   const leftMapping: MappingNode = {
@@ -263,12 +261,16 @@ function selectPath (context: any, labels: Labels) {
   }
   rightMapping.nodeID = activePath.vertices[activePath.vertices.length - 1]
   rightMapping.mapBy = rightLabel
+  if (activePath.height > 6) {
+    context.commit(Mutations.CHANGE_DEPTH, 6)
+  } else {
+    context.commit(Mutations.CHANGE_DEPTH, activePath.height)
+  }
   context.commit(Mutations.CHANGE_LEFT_MAPPING, [leftMapping])
   context.commit(Mutations.CHANGE_RIGHT_MAPPING, [rightMapping])
   context.commit(Mutations.CHANGE_ROOT_ID, rootId)
   context.commit(Mutations.CHANGE_VISITED_NODES, [createVisitedNode(rootId, labels[rootId])])
   context.commit(Mutations.CHANGE_PATH_NODES, createPathNodes(context.state.nodes, context.state.activePath))
-  // context.commit(Mutations.)
 }
 
 function updatePath (context: any, value: number) {
@@ -327,12 +329,12 @@ function appendNodeTree (context: any, circle: Circle) {
   }
 }
 
-function createHierarchyForTree (context: any) {
+function createHierarchyForTree (context: any, depth: number) {
   if (context.state.nodes.length === 0) {
     return undefined
   } else {
-    context.commit(Mutations.CHANGE_TREE_HIERARCHY, createTree(context.state.rootId, context.state.nodes, MAX_TREE_DEPTH))
-    context.commit(Mutations.CHANGE_TREE_HEIGHT, MAX_TREE_DEPTH)
+    context.commit(Mutations.CHANGE_TREE_HIERARCHY, createTree(context.state.rootId, context.state.nodes, depth))
+    context.commit(Mutations.CHANGE_TREE_HEIGHT, depth)
   }
 }
 

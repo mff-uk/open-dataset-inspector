@@ -74,17 +74,15 @@ export default Vue.extend({
     if (this.rightDataset !== undefined || this.leftDataset !== undefined) {
       this.initNodes()
     }
-    
     this.resizeCanvas({
       // @ts-ignore
       height: this.$refs.svg.clientHeight,
       // @ts-ignore
       width: this.$refs.svg.clientWidth
     })
-
     this.updateVisualisation()
 
-    const g = d3.selectAll('g')
+        const g = d3.selectAll('g')
 
     /* eslint-disable no-undef */
     // @ts-ignore
@@ -153,5 +151,9 @@ export default Vue.extend({
   cursor: pointer;
   text-anchor: middle;
   pointer-events: none;
+}
+
+#svg {
+  border: 1px solid gray;
 }
 </style>

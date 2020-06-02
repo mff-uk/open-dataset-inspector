@@ -7,6 +7,7 @@
           <v-col cols="12">
             <v-row>
               <History-bar
+                v-if="historyBarVisible"
                 v-bind:activeView="activeView"
               ></History-bar>
             </v-row>
@@ -38,8 +39,8 @@ import HistoryBar from './Layout/HistoryBar.vue'
 import PathBar from './Layout/PathBar.vue'
 import { Actions, Mutations, Getters, STORE_NAME } from './Visualisation.store'
 import { mapActions, mapMutations, mapGetters } from 'vuex'
-import { ROOT_LABEL, ROOT_ID } from '../models'
-import { createLabel } from '../utils/nodesUtils'
+import { ROOT_LABEL, ROOT_ID, MAX_TREE_DEPTH } from '../models'
+import { createVisitedNode } from '../utils/nodesUtils'
 import { createPaths } from '../utils/pathUtils'
 
 export default Vue.extend({
@@ -51,11 +52,13 @@ export default Vue.extend({
   },
   props: ['rightDataset', 'leftDataset', 'pathsDataset', 'activeView', 'labels'],
   data: () => ({
-    paths: undefined
+    paths: undefined,
+    historyBarVisible: true
   }),
   computed: {
     ...mapGetters(STORE_NAME, {
-      nodes: Getters.GET_NODES
+      nodes: Getters.GET_NODES,
+      activePath: Getters.GET_ACTIVE_PATH
     })
   },
   watch: {
@@ -97,6 +100,7 @@ export default Vue.extend({
       changeRightMapping: Mutations.CHANGE_RIGHT_MAPPING
     }),
     updatePaths: function () {
+      this.historyBarVisible = true
       if (this.pathsDataset !== undefined) {
         this.pathsVisible = true
         this.paths = createPaths(this.nodes, this.pathsDataset, this.labels)
@@ -104,10 +108,11 @@ export default Vue.extend({
       this.changeActivePath(undefined)
     },
     cancelClicked: function () {
+      this.historyBarVisible = true
       this.changeLeftMapping([])
       this.changeRightMapping([])
       this.changeRootId(ROOT_ID)
-      this.changeVisitedNodes([createLabel(ROOT_ID, ROOT_LABEL)])
+      this.changeVisitedNodes([createVisitedNode(ROOT_ID, ROOT_LABEL)])
       this.changePathNodes([])
       this.changeActivePath(undefined)
       switch (this.activeView) {
@@ -116,12 +121,13 @@ export default Vue.extend({
           this.updateCircleCanvas()
           break
         case 2:
-          this.createHierarchyForTree()
+          this.createHierarchyForTree(MAX_TREE_DEPTH)
           this.updateTreeCanvas()
           break
       }
     },
     pathUpdated: function () {
+      this.historyBarVisible = false
       this.selectPath(this.labels)
       switch (this.activeView) {
         case 1:
@@ -129,7 +135,7 @@ export default Vue.extend({
           this.updateCircleCanvas()
           break
         case 2:
-          this.createHierarchyForTree()
+          this.createHierarchyForTree(this.activePath.height)
           this.updateTreeCanvas()
           break
       }

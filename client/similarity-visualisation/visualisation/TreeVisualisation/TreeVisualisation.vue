@@ -26,7 +26,7 @@ import TreeLink from './TreeLink.vue'
 import TreeLabel from './TreeLabel.vue'
 import { mapGetters, mapActions, mapMutations } from 'vuex'
 import { Actions, Getters, Mutations, STORE_NAME } from '../Visualisation.store'
-import { Circle, Position, ROOT_ID, ROOT_LABEL } from '../../models'
+import { Circle, Position, ROOT_ID, ROOT_LABEL, MAX_TREE_DEPTH } from '../../models'
 import { createNodes } from '../../utils/nodesUtils'
 import { createLabels, createHierarchy } from '../../utils/hierarchyUtils'
 
@@ -47,7 +47,8 @@ export default Vue.extend({
       circles: Getters.GET_TREE_NODES,
       links: Getters.GET_TREE_LINKS,
       hierarchy: Getters.GET_HIERARCHY,
-      nodes: Getters.GET_NODES
+      nodes: Getters.GET_NODES,
+      activePath: Getters.GET_ACTIVE_PATH
     })
   },
   created () {
@@ -69,17 +70,10 @@ export default Vue.extend({
 
     this.updateVisualisation()
 
-    const g = d3.selectAll('g')
-
-    /* eslint-disable no-undef */
-    // @ts-ignore
+    var zoom = d3.zoom().on("zoom", this.zoomed)
     d3.select('#svg')
       // @ts-ignore
-      .call(d3.zoom().on('zoom', function () {
-        g.attr('transform', d3.event.transform)
-      }))
-    /* eslint-enable no-undef */
-    // 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')'
+      .call(zoom)
   },
   watch: {
     rightDataset () {
@@ -87,6 +81,21 @@ export default Vue.extend({
     },
     leftDataset () {
       this.updateVisualisation()
+    },
+    circles () {
+      if (this.activePath !== undefined) {
+        const zoom = d3.zoom().on("zoom", this.zoomed)
+        // // @ts-ignore
+        // const x = this.circles[0].x + 100
+        // // @ts-ignore
+        // const y = this.circles[0].y + 100
+        // console.log("transform", "translate(-"+ x +", -"+ y +")scale(1)")
+        d3.select('#svg')
+          .transition()
+          .duration(750)
+          // @ts-ignore
+          .call(zoom.transform, d3.zoomIdentity);
+      }
     }
   },
   methods: {
@@ -104,7 +113,7 @@ export default Vue.extend({
       changeHierarchy: Mutations.CHANGE_HIERARCHY
     }),
     updateVisualisation: function () {
-      this.createHierarchyForTree()
+      this.createHierarchyForTree(MAX_TREE_DEPTH)
       this.updateTreeCanvas()
     },
     handleResize () {
@@ -126,6 +135,10 @@ export default Vue.extend({
     initNodes: function () {
       this.changeHierarchy(createHierarchy(this.leftDataset, this.rightDataset))
       this.changeNodes(createNodes(this.hierarchy, this.labels))
+    },
+    zoomed: function () {
+      d3.selectAll('g')
+        .attr("transform", d3.event.transform)
     }
   }
 })
@@ -140,5 +153,9 @@ export default Vue.extend({
   cursor: pointer;
   text-anchor: middle;
   pointer-events: none;
+}
+
+#svg {
+  border: 1px solid gray;
 }
 </style>

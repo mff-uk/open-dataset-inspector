@@ -7,6 +7,11 @@
           @mappingChanged="mappingChanged"
           v-bind:mappingList="leftMappingTree"
           v-bind:sidebarPosition="left"
+          v-bind:title="leftInfo.title"
+          v-bind:collection="leftInfo.collection"
+          v-bind:description="leftInfo.description"
+          v-bind:url="leftInfo.url"
+          v-bind:keywords="leftInfo.keywords"
         >
         </side-bar>
       </v-col>
@@ -30,6 +35,11 @@
           @mappingChanged="mappingChanged"
           v-bind:mappingList="rightMappingTree"
           v-bind:sidebarPosition="right"
+          :title="rightInfo.title"
+          :collection="rightInfo.collection"
+          :description="rightInfo.description"
+          :url="rightInfo.url"
+          :keywords="rightInfo.keywords"
         >
         </side-bar>
       </v-col>
@@ -60,7 +70,21 @@ export default Vue.extend({
     left: Position.Left,
     right: Position.Right,
     leftMappingTree: Array<MappingNode>(),
-    rightMappingTree: Array<MappingNode>()
+    rightMappingTree: Array<MappingNode>(),
+    leftInfo: {
+      title: "",
+      collection: "",
+      description: "",
+      url: "",
+      keywords: [""]
+    },
+    rightInfo: {
+      title: "",
+      collection: "",
+      description: "",
+      url: "",
+      keywords: [""]
+    }
   }),
   computed: {
     ...mapGetters(STORE_NAME, {
@@ -72,11 +96,27 @@ export default Vue.extend({
       const position = Position.Left
       const dataset = this.leftDataset
       this.updateMappingsCombobox(dataset, position)
+      this.changeLeftMapping(Array<MappingNode>())
+      this.leftInfo = {
+        title: this.leftDataset.metadata.title,
+        description: this.leftDataset.metadata.description,
+        url: this.leftDataset.url,
+        keywords: this.leftDataset.metadata.keywords,
+        collection: this.leftDataset.collection
+      }
     }
     if (this.rightDataset !== undefined) {
       const position = Position.Right
       const dataset = this.rightDataset
       this.updateMappingsCombobox(dataset, position)
+      this.changeRightMapping(Array<MappingNode>()),
+      this.rightInfo = {
+        title: this.rightDataset.metadata.title,
+        description: this.rightDataset.metadata.description,
+        url: this.rightDataset.url,
+        keywords: this.rightDataset.metadata.keywords,
+        collection: this.rightDataset.collection
+      }
     }
   },
   mounted () {
@@ -85,12 +125,28 @@ export default Vue.extend({
       const position = Position.Left
       const dataset = this.leftDataset
       this.updateMappingsCombobox(dataset, position)
+      this.changeLeftMapping(Array<MappingNode>())
+      this.leftInfo = {
+        title: this.leftDataset.metadata.title,
+        description: this.leftDataset.metadata.description,
+        url: this.leftDataset.url,
+        keywords: this.leftDataset.metadata.keywords,
+        collection: this.leftDataset.collection
+      }
     }
     if (this.rightDataset !== undefined) {
       this.initializeVisualisation()
       const position = Position.Right
       const dataset = this.rightDataset
       this.updateMappingsCombobox(dataset, position)
+      this.changeRightMapping(Array<MappingNode>()),
+      this.rightInfo = {
+        title: this.rightDataset.metadata.title,
+        description: this.rightDataset.metadata.description,
+        url: this.rightDataset.url,
+        keywords: this.rightDataset.metadata.keywords,
+        collection: this.rightDataset.collection
+      }
     }
   },
   watch: {
@@ -98,11 +154,27 @@ export default Vue.extend({
       const position = Position.Left
       const dataset = this.leftDataset
       this.updateMappingsCombobox(dataset, position)
+      this.changeLeftMapping(Array<MappingNode>())
+      this.leftInfo = {
+        title: this.leftDataset.metadata.title,
+        description: this.leftDataset.metadata.description,
+        url: this.leftDataset.url,
+        keywords: this.leftDataset.metadata.keywords,
+        collection: this.leftDataset.collection
+      }
     },
     rightDataset () {
       const position = Position.Right
       const dataset = this.rightDataset
       this.updateMappingsCombobox(dataset, position)
+      this.changeRightMapping(Array<MappingNode>())
+      this.rightInfo = {
+        title: this.rightDataset.metadata.title,
+        description: this.rightDataset.metadata.description,
+        url: this.rightDataset.url,
+        keywords: this.rightDataset.metadata.keywords,
+        collection: this.rightDataset.collection
+      }
     }
   },
   methods: {
@@ -160,6 +232,7 @@ export default Vue.extend({
       dataset.mappings.forEach((element: {data: [], metadata: {from: string, title: string, input: []}}, i: number) => {
         addMappingItemToArray(result, element, i)
       })
+      result.push(new ComboboxItem('All', result.length))
       switch (position) {
         case Position.Left:
           this.changeLeftMappingList(result)

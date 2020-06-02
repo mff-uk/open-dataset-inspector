@@ -1,5 +1,24 @@
 <template>
   <v-container>
+    <v-card
+      v-bind:content="`
+        ${title}</br></br>
+        ${description}</br>
+        Keywords: ${keywordsString}
+      `"
+      v-tippy='{interactive : true, animateFill: false, placement:"right", animation:"shift-toward", delay:100, arrow : true}'
+      @click="visitDataset"
+      class="mx-auto info-card"
+      outlined
+    >
+      <v-list-item three-line>
+        <v-list-item-content>
+          <v-list-item-title class="headline mb-1">{{ title }}</v-list-item-title>
+          <v-list-item-group>{{ collection }}</v-list-item-group>
+          <v-list-item-subtitle>{{ description }}</v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+    </v-card>
     <v-select
       :items="selectList"
       item-text="name"
@@ -8,7 +27,11 @@
       @change="changeMapping"
       >
     </v-select>
-    <tree-view-list v-bind:items="mappingList" @selectedItems="selectedChanged" ></tree-view-list>
+    <tree-view-list
+      v-bind:items="mappingList"
+      @selectedItems="selectedChanged"
+    >
+    </tree-view-list>
   </v-container>
 </template>
 
@@ -26,7 +49,7 @@ export default Vue.extend({
   components: {
     TreeViewList
   },
-  props: ['sidebarPosition', 'mappingList'],
+  props: ['sidebarPosition', 'mappingList', 'title', 'collection', 'description', 'url', 'keywords'],
   data: () => ({
     error: Error()
   }),
@@ -41,6 +64,14 @@ export default Vue.extend({
       } else {
         return this.rightList
       }
+    },
+    keywordsString: function () {
+      let result: string = ''
+      this.keywords.forEach((element: string) => {
+        result = element + '  ' + result
+      })
+      console.log(result)
+      return result
     }
   },
   methods: {
@@ -49,7 +80,15 @@ export default Vue.extend({
     },
     selectedChanged: function (array: Array<MappingNode>) {
       this.$emit('mappingChanged', this.sidebarPosition, array)
+    },
+    visitDataset: function () {
+      const win = window.open(this.url)
+      if (win !== null) {
+        win.focus()
+      }
     }
   }
 })
 </script>
+<style scoped>
+</style>

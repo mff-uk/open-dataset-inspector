@@ -260,7 +260,7 @@ export function packMappingArrows (height: number, width: number, circles: Array
       mapTo: viewDepthLevel[i].label,
       lx: position === Position.Left ? 0 : width,
       ly: height / 2,
-      rx: position === Position.Left ? targetNode.x - targetNode.r * 10 / 10 : targetNode.x + targetNode.r * 10 / 10,
+      rx: position === Position.Left ? targetNode.x - targetNode.r : targetNode.x + targetNode.r,
       ry: targetNode.y,
       r: targetNode.r
     }
@@ -273,13 +273,17 @@ export function packMappingArrows (height: number, width: number, circles: Array
 export function highlightTreeMapping (circles: Array<Circle>, leftMappingNodes: Array<ArrowData>, rightMappingNodes: Array<ArrowData>) {
   for (let i = 0; i < leftMappingNodes.length; i++) {
     const targetCircle = getCircleById(circles, leftMappingNodes[i].id)
-    targetCircle.fill = 'red'
-    targetCircle.r += 2
+    if (targetCircle !== undefined) {
+      targetCircle.fill = 'red'
+      targetCircle.r += 2
+    }
   }
   for (let i = 0; i < rightMappingNodes.length; i++) {
     const targetCircle = getCircleById(circles, rightMappingNodes[i].id)
-    targetCircle.fill = 'red'
-    targetCircle.r += 2
+    if (targetCircle !== undefined) {
+      targetCircle.fill = 'red'
+      targetCircle.r += 2
+    }
   }
 }
 
@@ -315,7 +319,15 @@ function createMappingNodeWithMap (id: number, name: string, mapBy: string, node
 export function createMapping (labels: Labels, mapping: any, mappingID: number) {
   const result = Array<MappingNode>()
   const mappingDataArray = Array<MappingData>()
-  mapping.mappings[mappingID].data.forEach((item: any) => {
+  let datas: any = []
+  if (mappingID >= mapping.mappings.length) {
+    mapping.mappings.forEach((element: any) => {
+      datas = datas.concat(element.data)
+    });
+  } else {
+    datas = mapping.mappings[mappingID].data
+  }
+  datas.forEach((item: any) => {
     mappingDataArray.push(createMappingData(item.id, item.metadata.group, item.metadata.size, item.metadata.shared))
   })
   let counter = 1
