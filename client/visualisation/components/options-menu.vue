@@ -38,7 +38,7 @@
       dark
       color="blue"
       content="Open similarity dialog"
-      @click="$emit('show-path-dialog')"
+      @click="$emit('show-similarity-dialog')"
     >
       <v-icon dark>
         mdi-decagram

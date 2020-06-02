@@ -11,16 +11,18 @@
       :labels="labels"
       :nodes-properties="nodesProperties"
       :highlight-options="highlightOptions"
-      :paths="paths"
       :paths-are-available="pathsAreAvailable"
+      :similarity="similarity"
+      :similarity-options="similarityOptions"
       @add-dataset="showDatasetDialog = true"
       @remove-dataset="onRemoveDataset"
+      @show-similarity-dialog="showSimilarityDialog = true"
     />
     <similarity-visualisation
       v-if="activeView > 0"
       :left-dataset="datasets[0]"
       :right-dataset="datasets[1]"
-      :paths="paths"
+      :paths="similarity === undefined ? [] : similarity.paths"
       :labels="labels"
       :active-view="activeView"
     />
@@ -28,7 +30,7 @@
       <v-row>
         <options-menu
           @show-mapping-dialog="showMappingDialog = true"
-          @show-path-dialog="showPathDialog = true"
+          @show-similarity-dialog="showSimilarityDialog = true"
           @show-highlight-dialog="showHighlightDialog = true"
         />
         &nbsp;
@@ -49,11 +51,11 @@
       @reject="showMappingDialog = false"
     />
     <similarity-dialog
-      :visible="showPathDialog"
+      :visible="showSimilarityDialog"
       :options="similarityOptions"
       :dataset-count="datasets.length"
       @accept="changePathOptions"
-      @reject="showPathDialog = false"
+      @reject="showSimilarityDialog = false"
     />
     <highlight-dialog
       :visible="showHighlightDialog"
@@ -82,8 +84,8 @@ import {
   GET_EDGES,
   GET_HIERARCHY,
   GET_NODES_PROPERTIES,
+  GET_SIMILARITY,
   GET_SIMILARITY_AVAILABLE,
-  GET_SIMILARITY_PATHS,
   GET_SIMILARITY_OPTIONS,
 } from "./visualisation-store";
 import { SimilarityVisualisation } from "../similarity-visualisation";
@@ -112,7 +114,7 @@ export default {
   "data": () => ({
     "showDatasetDialog": false,
     "showMappingDialog": false,
-    "showPathDialog": false,
+    "showSimilarityDialog": false,
     "showHighlightDialog": false,
     //
     "activeView": 0,
@@ -128,8 +130,8 @@ export default {
       "hierarchy": GET_HIERARCHY,
       "nodesProperties": GET_NODES_PROPERTIES,
       "pathsAreAvailable": GET_SIMILARITY_AVAILABLE,
-      "paths": GET_SIMILARITY_PATHS,
       "similarityOptions": GET_SIMILARITY_OPTIONS,
+      "similarity": GET_SIMILARITY,
     }),
   },
   "mounted": function () {
@@ -159,10 +161,10 @@ export default {
       this.$store.dispatch(REMOVE_DATASET, dataset);
     },
     "onSetPaths": function () {
-      this.showPathDialog = true;
+      this.showSimilarityDialog = true;
     },
     "changePathOptions": function (options) {
-      this.showPathDialog = false;
+      this.showSimilarityDialog = false;
       //
       this.$store.dispatch(SET_SIMILARITY_OPTIONS, options);
       if (this.datasets.length === 2) {

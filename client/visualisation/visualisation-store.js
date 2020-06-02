@@ -41,9 +41,9 @@ export const GET_NODES_PROPERTIES = "get_nodes_props";
 
 export const GET_SIMILARITY_AVAILABLE = "get_similarity_paths_available";
 
-export const GET_SIMILARITY_PATHS = "get_similarity_paths";
-
 export const GET_SIMILARITY_OPTIONS = "get_similarity_options";
+
+export const GET_SIMILARITY = "get_similarity";
 
 export function createStore() {
   return {
@@ -97,8 +97,8 @@ export function createStore() {
       [GET_HIERARCHY]: (state) => state.hierarchy,
       [GET_NODES_PROPERTIES]: (state) => state.nodesProperties,
       [GET_SIMILARITY_AVAILABLE]: (state) => state.similarity.fetched,
-      [GET_SIMILARITY_PATHS]: (state) => state.similarity.data.paths,
       [GET_SIMILARITY_OPTIONS]: (state) => state.similarityOptions,
+      [GET_SIMILARITY]: (state) => state.similarity.data,
     },
     "actions": {
       [ADD_DATASET_ACTION]: addDatasetAction,
@@ -118,7 +118,7 @@ function emptySimilarity() {
   return {
     "fetched": false,
     "loading": false,
-    "data": {},
+    "data": { },
     "datasets": [],
   };
 }
@@ -264,6 +264,7 @@ function clearSimilarity(state) {
 }
 
 function setSimilarity(state, event) {
+  console.log("S", event.similarity);
   state.similarity = {
     "fetched": true,
     "loading": false,
