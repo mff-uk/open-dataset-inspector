@@ -3,6 +3,7 @@
     v-model="showSpeedDial"
     transition="scale-transition"
     open-on-hover
+    persistent
   >
     <template v-slot:activator>
       <v-btn
