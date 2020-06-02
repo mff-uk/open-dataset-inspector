@@ -25,7 +25,9 @@
       </span>
       ID:{{ selected.id }} <br>
       Label: {{ selected.label }} <br>
-      Tokens: {{ selected.mappedBy }}
+      <span v-show="selected.mappedBy.length > 0">
+        Mapped by: {{ selected.mappedBy }}
+      </span>
     </div>
     <div style="position: absolute; top: -10rem;">
       <input
