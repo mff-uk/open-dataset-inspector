@@ -1,5 +1,5 @@
 <template>
-  <svg id="svg" ref="svg" width="100%" height="70vh">
+  <svg id="svg" ref="svg" width="100%" height="90vh">
     <g>
       <template v-for="(c, index) in links">
         <tree-link class="movable" v-bind:key="index" v-bind:linkData="c"></tree-link>

@@ -1,10 +1,5 @@
 <template>
-    <v-container>
-      <v-row>
-        <v-col cols="2">
-        </v-col>
-        <v-col cols="8">
-          <v-col cols="12">
+    <v-container fluid>
             <History-bar
               v-if="historyBarVisible"
               v-bind:activeView="activeView"
@@ -23,11 +18,6 @@
               >
               </path-bar>
             </v-row>
-          </v-col>
-        </v-col>
-        <v-col cols="2">
-        </v-col>
-      </v-row>
     </v-container>
 </template>
 

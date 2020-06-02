@@ -1,15 +1,15 @@
 <template>
   <v-container fluid>
-      <v-btn
-        color="green"
-        absolute
-        dark
-        fab
-        small
-        @click="center"
-      >
-        <v-icon>mdi-image-filter-center-focus-strong-outline</v-icon>
-      </v-btn>
+    <v-btn
+      color="green"
+      absolute
+      dark
+      fab
+      small
+      @click="center"
+    >
+      <v-icon>mdi-image-filter-center-focus-strong-outline</v-icon>
+    </v-btn>
     <svg id="svg" ref="svg" width="100%" height="90vh">
       <defs>
         <!-- arrowhead marker definition -->
