@@ -181,7 +181,8 @@ def _expand_level(
 def paths_to_output(
         paths: typing.List[Path], datasets: typing.List[Dataset],
         metadata: typing.Dict = None):
-    path_lengths = [len(path.nodes) for path in paths]
+    # Subtract 2 for start and end node.
+    path_lengths = [len(path.nodes) - 2 for path in paths]
 
     if metadata is None:
         metadata = {}
