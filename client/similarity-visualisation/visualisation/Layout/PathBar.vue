@@ -40,6 +40,7 @@
       >
         {{ c.label.length > 5 ? c.label.substring(0, 5) + ".." : c.label }}
       </v-btn>
+      <v-icon v-bind:key="'arrow' + index">{{ activePath.arrows[index] }}</v-icon>
     </template>
   </v-container>
 </template>
