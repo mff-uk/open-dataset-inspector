@@ -5,7 +5,7 @@
     app
   >
     <v-toolbar-title class="title">
-      Dataset Similarity
+      Open Dataset Inspector
     </v-toolbar-title>
     <v-btn
       :to="{'name':'evaluation'}"
