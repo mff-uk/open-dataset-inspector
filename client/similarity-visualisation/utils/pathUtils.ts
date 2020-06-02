@@ -27,17 +27,20 @@ export function createPaths (nodes: Array<Node>, paths: any, labels: Labels): Ar
     for (let j = 0; j < paths[i].nodes.length; j++) {
       vertices.push(paths[i].nodes[j])
     }
+    let arrows: Array<string> = []
     let up = 0
     let down = 0
     const root = paths[i].shared
     let rootVisited = true
     for (let j = 0; j < paths[i].nodes.length; j++) {
       if (paths[i].nodes[j] !== root && rootVisited) {
+        arrows.push('▲')
         up++
       } else {
         if (paths[i].nodes[j] === root) {
           rootVisited = false
         } else {
+          arrows.push('▼')
           down++
         }
       }
@@ -48,7 +51,7 @@ export function createPaths (nodes: Array<Node>, paths: any, labels: Labels): Ar
     } else {
       height = down
     }
-    array.push(new Path(from, to, vertices, up, down, height))
+    array.push(new Path(from, to, vertices, up, down, height, arrows))
   }
   return array
 }
