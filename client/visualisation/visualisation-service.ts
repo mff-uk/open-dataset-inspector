@@ -8,7 +8,6 @@ export interface MappingFilterOptions {
 }
 
 export interface HighlightFilterOptions {
-  directlyMapped: boolean;
   usedInPaths: boolean;
 }
 
@@ -31,7 +30,6 @@ export function createDefaultMappingOptions() : MappingFilterOptions {
 
 export function createDefaultHighlightFilterOptions() : HighlightFilterOptions {
   return {
-    "directlyMapped": false,
     "usedInPaths": true,
   }
 }

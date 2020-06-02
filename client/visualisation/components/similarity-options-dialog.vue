@@ -7,7 +7,7 @@
     <v-card>
       <v-card-title>
         <span class="headline">
-          Select similarity method
+          Similarity configuration
         </span>
       </v-card-title>
       <v-card-text>

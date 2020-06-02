@@ -7,7 +7,7 @@
     <v-card>
       <v-card-title>
         <span class="headline">
-          Mapping filter configuration
+          Mapping configuration
         </span>
       </v-card-title>
       <v-card-text>
@@ -19,7 +19,7 @@
           v-model="local.userFilterFunction"
           label="Filter function"
           hint="Hint: (mapping) => mapping.metadata.directly_mapped"
-        ></v-textarea>
+        />
       </v-card-text>
       <v-card-actions>
         <div class="flex-grow-1" />

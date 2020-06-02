@@ -7,14 +7,10 @@
     <v-card>
       <v-card-title>
         <span class="headline">
-          Highlight filter configuration
+          Highlight configuration
         </span>
       </v-card-title>
       <v-card-text>
-        <v-switch
-          v-model="local.directlyMapped"
-          label="Show only directly mapped"
-        />
         <v-switch
           v-model="local.usedInPaths"
           label="Show only nodes used in paths if paths are available"
@@ -49,7 +45,6 @@ export default {
   },
   "data": () => ({
     "local": {
-      "directlyMapped": undefined,
       "usedInPaths": undefined,
     },
   }),
