@@ -36,6 +36,7 @@
         v-bind:key="index"
         class="btn-help ma-2"
         fab
+        @click="pathNodeClicked(c)"
         v-bind:color="c.color"
       >
         {{ c.label.length > 5 ? c.label.substring(0, 5) + ".." : c.label }}
@@ -78,6 +79,9 @@ export default Vue.extend({
     },
     cancelClicked: function () {
       this.$emit('cancelClicked')
+    },
+    pathNodeClicked: function (data: Node) {
+      this.$emit('pathNodeClicked', data)
     }
   }
 })

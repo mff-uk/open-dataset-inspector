@@ -21,6 +21,7 @@
                 v-bind:paths="paths"
                 @cancelClicked='cancelClicked'
                 @pathUpdated='pathUpdated'
+                @pathNodeClicked='pathNodeClicked'
               >
               </path-bar>
             </v-row>
@@ -138,6 +139,14 @@ export default Vue.extend({
           this.createHierarchyForTree(this.activePath.height)
           this.updateTreeCanvas()
           break
+      }
+    },
+    pathNodeClicked: function (data) {
+      this.historyBarVisible = false
+      if (this.activeView === 1) {
+        this.changeRootId(data.id)
+        this.createHierarchyForCircles()
+        this.updateCircleCanvas()
       }
     }
   }
