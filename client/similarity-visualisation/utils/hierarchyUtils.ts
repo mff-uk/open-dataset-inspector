@@ -342,7 +342,9 @@ export function createMapping (labels: Labels, mapping: any, mappingID: number) 
       if (mapArray[element] === undefined) {
         mapArray[element] = Array<string>()
       }
-      mapArray[element].push(name)
+      if (!mapArray[element].includes(name)) {
+        mapArray[element].push(name)
+      }
     });
   })
   let counter = 0

@@ -135,6 +135,7 @@ export default Vue.extend({
     },
     pathUpdated: function () {
       this.$emit('pathUpdated')
+      let height = MAX_TREE_DEPTH
       if (this.activePath !== undefined) {
         this.historyBarVisible = false
         this.selectPath(this.labels)
@@ -148,6 +149,7 @@ export default Vue.extend({
         const rightItems = chooseItemFromMapping(this.rightMapping, rightId)
         this.changeLeftSelectedIds(leftItems)
         this.changeRightSelectedIds(rightItems)
+        height = this.activePath.height
       } else {
         this.historyBarVisible = true
         this.changeLeftSelectedIds([])
@@ -161,7 +163,7 @@ export default Vue.extend({
           this.updateCircleCanvas()
           break
         case 2:
-          this.createHierarchyForTree(this.activePath.height)
+          this.createHierarchyForTree(height)
           this.updateTreeCanvas()
           break
       }
