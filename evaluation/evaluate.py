@@ -8,22 +8,37 @@ import numpy
 import typing
 import datetime
 import dateutil.parser
+import copy
 from dataclasses import dataclass
 
 
 @dataclass
 class RawEvaluation:
+    session: str
     user: str
     group: str
-    useCase: str
+    use_case: str
     rating: typing.Dict[str, float]
-    submitTime: datetime.datetime
+    load_time: datetime.datetime
+    submit_time: datetime.datetime
+
+
+@dataclass
+class RawEvaluationAction(RawEvaluation):
+    """Action type causing the """
+    action: str
+
+
+@dataclass
+class RawEvaluationSubmit(RawEvaluation):
+    """Times of evaluation actions without submit."""
+    action_times: typing.List[datetime.datetime]
 
 
 @dataclass
 class Score:
     value: float
-    useCase: str
+    evaluation: RawEvaluationSubmit
 
 
 @dataclass
@@ -54,12 +69,10 @@ def main():
     evaluations = load_evaluations()
     evaluations = [item for item in evaluations
                    if item.user not in ["Test", "MaNe"]]
-
     evaluations = normalize_with_respect_to_method(
         evaluations, "nkod-_title_description_.join.reduce.tlsh.tlsh")
     evaluations = keep_last_submits(evaluations)
-
-    print("# all data count:", len(evaluations))
+    print("# ALL")
     evaluate_and_print(evaluations)
     for user, user_evaluations in iterate_per_user(evaluations):
         print()
@@ -67,21 +80,52 @@ def main():
         evaluate_and_print(user_evaluations)
 
 
-def load_evaluations() -> typing.List[RawEvaluation]:
+def load_evaluations() -> typing.List[RawEvaluationSubmit]:
     evaluation_directory = "../data/evaluation-reports"
     result = []
     for file_name in os.listdir(evaluation_directory):
         file_path = os.path.join(evaluation_directory, file_name)
         with open(file_path, encoding="utf-8") as stream:
             content = json.load(stream)
-        if content["task"]["action"] != "submit":
-            continue
-        result.append(RawEvaluation(
+        result.append(RawEvaluationAction(
+            content["task"]["session"],
             content["task"]["user"],
             content["task"]["group"],
             content["task"].get("useCaseId", None),
             {key: float(value) for key, value in content["rating"].items()},
-            dateutil.parser.parse(content["task"]["timePost"])
+            dateutil.parser.parse(content["task"]["timeLoad"]),
+            dateutil.parser.parse(content["task"]["timePost"]),
+            content["task"]["action"]
+        ))
+    return group_raw_results(result)
+
+
+def group_raw_results(evaluations: typing.List[RawEvaluationAction]) \
+        -> typing.List[RawEvaluationSubmit]:
+    considered_actions = ["change-method-order", "change-method-order-number"]
+    collector = collections.defaultdict(list)
+    for item in evaluations:
+        identification = item.session + item.user + str(item.load_time)
+        collector[identification].append(item)
+    result = []
+    for items in collector.values():
+        action_times = sorted([
+            item.submit_time for item in items
+            if item.action in considered_actions
+        ])
+        submit = [item for item in items if item.action == "submit"]
+        if not len(submit) == 1:
+            continue
+        submit_item: RawEvaluation = submit[0]
+        result.append(RawEvaluationSubmit(
+            submit_item.session,
+            submit_item.user,
+            submit_item.group,
+            submit_item.use_case,
+            submit_item.rating,
+            submit_item.load_time,
+            submit_item.submit_time,
+            action_times
         ))
     return result
 
@@ -116,16 +160,17 @@ def normalize_with_respect_to_method(
             """
             if scale == 0:
                 return 0
-            result = - (value - baseline) / scale
+            normalized_value = - (value - baseline) / scale
             # Python use negative zero, by next condition we get rid of it.
-            return 0 if result == 0 else result
+            return 0 if normalized_value == 0 else normalized_value
 
         rating = {
             key: normalize(value)
             for key, value in item.rating.items()
         }
-        result.append(RawEvaluation(
-            item.user, item.group, item.useCase, rating, item.submitTime))
+        result_item = copy.copy(item)
+        result_item.rating = rating
+        result.append(result_item)
     return result
 
 
@@ -133,10 +178,10 @@ def keep_last_submits(data: typing.List[RawEvaluation]) \
         -> typing.List[RawEvaluation]:
     result = {}
     for item in data:
-        ref = item.user + ":" + item.useCase
+        ref = item.user + ":" + item.use_case
         if ref not in result:
             result[ref] = item
-        elif result[ref].submitTime < item.submitTime:
+        elif result[ref].submit_time < item.submit_time:
             result[ref] = item
     return list(result.values())
 
@@ -154,7 +199,7 @@ def collect_methods_ratings(
     for user_evaluation in data:
         for method, method_rating in user_evaluation.rating.items():
             result[method].append(Score(
-                method_rating, user_evaluation.useCase))
+                method_rating, user_evaluation))
     return [MethodEvaluation(method, values)
             for method, values in result.items()]
 
@@ -162,11 +207,14 @@ def collect_methods_ratings(
 def print_statistics(
         statistics: typing.List[EvaluationStatistics],
         ref_method="nkod-_title_description_.join.reduce.tlsh.tlsh",
-        print_values=True):
+        print_values=True,
+        print_durations=True):
     use_cases = sorted({
-        score.useCase
+        score.evaluation.use_case
         for stats in statistics
-        for score in stats.scores})
+        for score in stats.scores},
+        key=lambda value: int(value)
+    )
 
     print("# use-cases:", "'" + "', '".join(use_cases) + "'")
 
@@ -179,12 +227,37 @@ def print_statistics(
         else:
             print("       ", end="")
         if print_values:
-            scores_dict = {score.useCase: score.value for score in item.scores}
-            values = [
-                scores_dict.get(use_case, None)
-                for use_case in scores_dict
-            ]
+            scores_by_use_case = {
+                score.evaluation.use_case: score.value
+                for score in item.scores
+            }
+            values = [scores_by_use_case.get(use_case, None)
+                      for use_case in use_cases]
             print(", ".join(["{: 03.2f}".format(x) for x in values]))
+
+    if print_durations:
+        scores_by_use_case = collections.defaultdict(list)
+        for score in sorted_stats[0].scores:
+            scores_by_use_case[score.evaluation.use_case].append(score)
+        import pprint
+        duration_by_use_case = {
+            use_case: numpy.mean(get_scores_evaluation_durations(scores))
+            for use_case, scores in scores_by_use_case.items()
+        }
+        values = [duration_by_use_case.get(use_case, None)
+                  for use_case in use_cases]
+        print(" " * 113, end="")
+        print(", ".join(["{:5d}".format(int(x)) for x in values]))
+
+
+def get_scores_evaluation_durations(scores: typing.List[Score]) \
+        -> typing.List[float]:
+    scores_durations = []
+    for score in scores:
+        start = score.evaluation.action_times[0]
+        duration = (score.evaluation.submit_time - start).total_seconds()
+        scores_durations.append(duration)
+    return scores_durations
 
 
 def iterate_per_user(evaluations: typing.List[RawEvaluation]):
