@@ -1,4 +1,4 @@
-import { MappingNode, Node, ArrowData, ROOT_ID, Circle, Arrow, Position, Labels, MappingData, MAX_TREE_DEPTH } from '../models'
+import { MappingNode, Node, ArrowData, ROOT_ID, Circle, Arrow, Position, Labels, MAX_TREE_DEPTH } from '../models'
 import { getNodeById, getNodeLabel } from './nodesUtils'
 
 export function createHierarchy (leftDataset: {hierarchy: [string, string, string]}, rightDataset: {hierarchy: [string, string, string]}) {
@@ -345,7 +345,7 @@ export function createMapping (labels: Labels, mapping: any, mappingID: number) 
       mapArray[element].push(name)
     });
   })
-  let counter = 1
+  let counter = 0
   for (const item in mapArray) {
     const nodes = mapArray[item]
     const mappingNodes: Array<MappingNode> = []
@@ -358,3 +358,20 @@ export function createMapping (labels: Labels, mapping: any, mappingID: number) 
   }
   return result
 }
+
+export function chooseItemFromMapping (mapping: Array<MappingNode>, id: string) {
+  let result: number[] = []
+  let childrens: Array<MappingNode> = []
+  mapping.forEach((item: MappingNode) => {
+    item.children?.forEach((children: MappingNode) => {
+      childrens.push(children)
+    })
+  })
+  childrens.forEach((children: MappingNode) => {
+    if (children.nodeID === id) {
+      result.push(children.id)
+    }
+  })
+  return result
+}
+

@@ -31,7 +31,7 @@ import { mapActions, mapMutations, mapGetters } from 'vuex'
 import { ROOT_LABEL, ROOT_ID, MAX_TREE_DEPTH } from '../models'
 import { createVisitedNode } from '../utils/nodesUtils'
 import { createPaths } from '../utils/pathUtils'
-import { createPathLabels } from '../utils/hierarchyUtils'
+import { createPathLabels, chooseItemFromMapping, createMapping } from '../utils/hierarchyUtils'
 
 export default Vue.extend({
   name: 'Layout',
@@ -50,7 +50,11 @@ export default Vue.extend({
   computed: {
     ...mapGetters(STORE_NAME, {
       nodes: Getters.GET_NODES,
-      activePath: Getters.GET_ACTIVE_PATH
+      activePath: Getters.GET_ACTIVE_PATH,
+      leftMapping: Getters.GET_LEFT_MAPPING_TREE_LIST,
+      rightMapping: Getters.GET_RIGHT_MAPPING_TREE_LIST,
+      leftMapList: Getters.GET_LEFT_MAPPING_LIST,
+      rightMapList: Getters.GET_RIGHT_MAPPING_LIST
     })
   },
   watch: {
@@ -89,7 +93,11 @@ export default Vue.extend({
       changePathNodes: Mutations.CHANGE_PATH_NODES,
       changeVisitedNodes: Mutations.CHANGE_VISITED_NODES,
       changeLeftMapping: Mutations.CHANGE_LEFT_MAPPING,
-      changeRightMapping: Mutations.CHANGE_RIGHT_MAPPING
+      changeRightMapping: Mutations.CHANGE_RIGHT_MAPPING,
+      changeLeftMappingTreeList: Mutations.CHANGE_LEFT_MAPPING_TREE_LIST,
+      changeRightMappingTreeList: Mutations.CHANGE_RIGHT_MAPPING_TREE_LIST,
+      changeLeftSelectedIds: Mutations.CHANGE_LEFT_SELECTED_ITEMS,
+      changeRightSelectedIds: Mutations.CHANGE_RIGHT_SELECTED_ITEMS
     }),
     updatePaths: function () {
       if (this.activePath !== undefined) {
@@ -130,9 +138,23 @@ export default Vue.extend({
       if (this.activePath !== undefined) {
         this.historyBarVisible = false
         this.selectPath(this.labels)
+        const leftId = this.activePath.vertices[0]
+        const rightId = this.activePath.vertices[this.activePath.vertices.length - 1]
+        const leftMapId = this.leftMapList.length
+        const rightMapId = this.rightMapList.length
+        this.changeLeftMappingTreeList(createMapping(this.labels, this.leftDataset, (leftMapId - 1)))
+        this.changeRightMappingTreeList(createMapping(this.labels, this.rightDataset, (rightMapId - 1)))
+        const leftItems = chooseItemFromMapping(this.leftMapping, leftId)
+        const rightItems = chooseItemFromMapping(this.rightMapping, rightId)
+        this.changeLeftSelectedIds(leftItems)
+        this.changeRightSelectedIds(rightItems)
       } else {
         this.historyBarVisible = true
-      }      
+        this.changeLeftSelectedIds([])
+        this.changeRightSelectedIds([])
+        this.changeLeftMappingTreeList([])
+        this.changeRightMappingTreeList([])
+      }
       switch (this.activeView) {
         case 1:
           this.createHierarchyForCircles()

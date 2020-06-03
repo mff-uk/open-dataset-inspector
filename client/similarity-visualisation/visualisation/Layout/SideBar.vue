@@ -30,6 +30,7 @@
     <tree-view-list
       v-bind:items="mappingList"
       @selectedItems="selectedChanged"
+      v-bind:position="sidebarPosition"
     >
     </tree-view-list>
   </v-container>

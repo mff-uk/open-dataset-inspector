@@ -69,8 +69,6 @@ export default Vue.extend({
   data: () => ({
     left: Position.Left,
     right: Position.Right,
-    leftMappingTree: Array<MappingNode>(),
-    rightMappingTree: Array<MappingNode>(),
     leftInfo: {
       title: "",
       collection: "",
@@ -88,7 +86,9 @@ export default Vue.extend({
   }),
   computed: {
     ...mapGetters(STORE_NAME, {
-      hierarchy: Getters.GET_HIERARCHY
+      hierarchy: Getters.GET_HIERARCHY,
+      leftMappingTree: Getters.GET_LEFT_MAPPING_TREE_LIST,
+      rightMappingTree: Getters.GET_RIGHT_MAPPING_TREE_LIST
     })
   },
   created () {
@@ -190,7 +190,9 @@ export default Vue.extend({
       changeRootId: Mutations.CHANGE_ROOT_ID,
       changeActivePath: Mutations.CHANGE_ACTIVE_PATH,
       changeVisitedNodes: Mutations.CHANGE_VISITED_NODES,
-      initPathNodes: Mutations.CHANGE_PATH_NODES
+      initPathNodes: Mutations.CHANGE_PATH_NODES,
+      changeLeftMappingTreeList: Mutations.CHANGE_LEFT_MAPPING_TREE_LIST,
+      changeRightMappingTreeList: Mutations.CHANGE_RIGHT_MAPPING_TREE_LIST
     }),
     initializeVisualisation: function () {
       this.changeRootId(ROOT_ID)
@@ -209,10 +211,10 @@ export default Vue.extend({
     mappingChoosed: function (position: Position, id: number) {
       switch (position) {
         case Position.Left:
-          this.leftMappingTree = createMapping(this.labels, this.leftDataset, id)
+          this.changeLeftMappingTreeList(createMapping(this.labels, this.leftDataset, id))
           break
         case Position.Right:
-          this.rightMappingTree = createMapping(this.labels, this.rightDataset, id)
+          this.changeRightMappingTreeList(createMapping(this.labels, this.rightDataset, id))
           break
       }
     },

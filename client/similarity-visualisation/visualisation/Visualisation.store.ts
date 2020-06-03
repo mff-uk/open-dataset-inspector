@@ -41,7 +41,11 @@ export const Mutations = {
   CHANGE_TREE_NODES: 'CHANGE_TREE_NODES',
   CHANGE_TREE_LINKS: 'CHANGE_TREE_LINKS',
   CHANGE_TREE_HEIGHT: 'CHANGE_TREE_HEIGHT',
-  CHANGE_HIERARCHY: 'CHANGE_HIERARCHY'
+  CHANGE_HIERARCHY: 'CHANGE_HIERARCHY',
+  CHANGE_RIGHT_SELECTED_ITEMS: 'CHANGE_RIGHT_SELECTED_ITEMS',
+  CHANGE_LEFT_SELECTED_ITEMS: 'CHANGE_LEFT_SELECTED_ITEMS',
+  CHANGE_LEFT_MAPPING_TREE_LIST: 'CHANGE_LEFT_MAPPING_TREE_LIST',
+  CHANGE_RIGHT_MAPPING_TREE_LIST: 'CHANGE_RIGHT_MAPPING_TREE_LIST'
 }
 
 export const Getters = {
@@ -65,7 +69,11 @@ export const Getters = {
   GET_TREE_HIERARCHY: 'GET_TREE_HIERARCHY',
   GET_TREE_NODES: 'GET_TREE_NODES',
   GET_TREE_LINKS: 'GET_TREE_LINKS',
-  GET_HIERARCHY: 'GET_HIERARCHY'
+  GET_HIERARCHY: 'GET_HIERARCHY',
+  GET_LEFT_SELECTED_ITEMS: 'GET_LEFT_SELECTED_ITEMS',
+  GET_RIGHT_SELECTED_ITEMS: 'GET_RIGHT_SELECTED_ITEMS',
+  GET_LEFT_MAPPING_TREE_LIST: 'GET_LEFT_MAPPING_TREE_LIST',
+  GET_RIGHT_MAPPING_TREE_LIST: 'GET_RIGHT_MAPPING_TREE_LIST'
 }
 
 export default {
@@ -75,12 +83,16 @@ export default {
     leftMapping: Array<MappingNode>(),
     rightMappingList: Array<ComboboxItem>(),
     rightMapping: Array<MappingNode>(),
+    leftMappingTreeList: Array<MappingNode>(),
+    rightMappingTreeList: Array<MappingNode>(),
     nodes: Array<Node>(),
     activePath: undefined,
     pathNodes: Array<Node>(),
     circles: Array<Circle>(),
     leftArrows: Array<Arrow>(),
     rightArrows: Array<Arrow>(),
+    leftSelectedItems: Array<number>(),
+    rightSelectedItems: Array<number>(),
     rootId: ROOT_ID,
     hierarchy: Array<[string, string, string]>(),
     circleHierarchy: new Node(ROOT_LABEL, Array<Node>(), Array<Node>(), ROOT_ID, 0, undefined, undefined),
@@ -157,6 +169,18 @@ export default {
     },
     [Getters.GET_HIERARCHY]: (state: {hierarchy: Array<[string, string, string]>}) => {
       return state.hierarchy
+    },
+    [Getters.GET_LEFT_SELECTED_ITEMS]: (state: {leftSelectedItems: Array<number>}) => {
+      return state.leftSelectedItems
+    },
+    [Getters.GET_RIGHT_SELECTED_ITEMS]: (state: {rightSelectedItems: Array<number>}) => {
+      return state.rightSelectedItems
+    },
+    [Getters.GET_LEFT_MAPPING_TREE_LIST]: (state: {leftMappingTreeList: Array<MappingNode>}) => {
+      return state.leftMappingTreeList
+    },
+    [Getters.GET_RIGHT_MAPPING_TREE_LIST]: (state: {rightMappingTreeList: Array<MappingNode>}) => {
+      return state.rightMappingTreeList
     }
   },
   mutations: {
@@ -223,6 +247,18 @@ export default {
     },
     [Mutations.CHANGE_HIERARCHY] (state: {hierarchy: Array<[string, string, string]>}, value: []) {
       state.hierarchy = value
+    },
+    [Mutations.CHANGE_RIGHT_SELECTED_ITEMS] (state: {rightSelectedItems: Array<number>}, value: []) {
+      state.rightSelectedItems = value
+    },
+    [Mutations.CHANGE_LEFT_SELECTED_ITEMS] (state: {leftSelectedItems: Array<number>}, value: []) {
+      state.leftSelectedItems = value
+    },
+    [Mutations.CHANGE_LEFT_MAPPING_TREE_LIST] (state: {leftMappingTreeList: Array<MappingNode>}, value: []) {
+      state.leftMappingTreeList = value
+    },
+    [Mutations.CHANGE_RIGHT_MAPPING_TREE_LIST] (state: {rightMappingTreeList: Array<MappingNode>}, value: []) {
+      state.rightMappingTreeList = value
     }
   },
   actions: {
