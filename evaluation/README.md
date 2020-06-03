@@ -18,8 +18,8 @@ mapped to positive integers.
 
 Next we compute several values:
  * *baseline* the score assigned to baseline method
- * *min_value* the minimal assigned score minus baseline*
- * *max_value* the maximum assigned score minus baseline*
+ * *min_value* the minimal assigned score minus *baseline*
+ * *max_value* the maximum assigned score minus *baseline*
  * *scale* ```max(abs(min_value), abs(max_value))```
 
 In our case the values are:
