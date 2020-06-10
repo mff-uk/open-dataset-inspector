@@ -19,6 +19,7 @@ class RawEvaluation:
     group: str
     use_case: str
     rating: typing.Dict[str, float]
+    raw_rating: typing.Dict[str, float]
     load_time: datetime.datetime
     submit_time: datetime.datetime
 
@@ -72,8 +73,12 @@ def main():
     evaluations = normalize_with_respect_to_method(
         evaluations, "nkod-_title_description_.join.reduce.tlsh.tlsh")
     evaluations = keep_last_submits(evaluations)
+
+    export_evaluations(evaluations, "../data/evaluation-reports-summary.json")
+
     print("# ALL")
     evaluate_and_print(evaluations)
+
     for user, user_evaluations in iterate_per_user(evaluations):
         print()
         print("# user:", user, "count:", len(user_evaluations))
@@ -92,6 +97,7 @@ def load_evaluations() -> typing.List[RawEvaluationSubmit]:
             content["task"]["user"],
             content["task"]["group"],
             content["task"].get("useCaseId", None),
+            {},
             {key: float(value) for key, value in content["rating"].items()},
             dateutil.parser.parse(content["task"]["timeLoad"]),
             dateutil.parser.parse(content["task"]["timePost"]),
@@ -123,6 +129,7 @@ def group_raw_results(evaluations: typing.List[RawEvaluationAction]) \
             submit_item.group,
             submit_item.use_case,
             submit_item.rating,
+            submit_item.raw_rating,
             submit_item.load_time,
             submit_item.submit_time,
             action_times
@@ -146,9 +153,9 @@ def normalize_with_respect_to_method(
     """
     result = []
     for item in data:
-        baseline = item.rating[method]
-        min_value = min(item.rating.values()) - baseline
-        max_value = max(item.rating.values()) - baseline
+        baseline = item.raw_rating[method]
+        min_value = min(item.raw_rating.values()) - baseline
+        max_value = max(item.raw_rating.values()) - baseline
         scale = max(abs(max_value), abs(min_value))
 
         def normalize(value: float) -> float:
@@ -166,7 +173,7 @@ def normalize_with_respect_to_method(
 
         rating = {
             key: normalize(value)
-            for key, value in item.rating.items()
+            for key, value in item.raw_rating.items()
         }
         result_item = copy.copy(item)
         result_item.rating = rating
@@ -264,6 +271,25 @@ def iterate_per_user(evaluations: typing.List[RawEvaluation]):
     users = {item.user for item in evaluations}
     for user in users:
         yield user, [item for item in evaluations if item.user == user]
+
+
+def export_evaluations(
+        evaluations: typing.List[RawEvaluationSubmit], output: str):
+    result = []
+    date_format = "%Y.%m.%dT%H:%M:%S"
+    for evaluation in evaluations:
+        result.append({
+            "user": evaluation.user,
+            "use-case": evaluation.use_case,
+            "load-time": evaluation.load_time.strftime(date_format),
+            "submit-time": evaluation.submit_time.strftime(date_format),
+            "action-time": [time.strftime(date_format)
+                            for time in evaluation.action_times],
+            "rating": evaluation.rating,
+            "raw-rating": evaluation.raw_rating,
+        })
+    with open(output, "w", encoding="utf-8") as stream:
+        json.dump(result, stream, indent=2)
 
 
 if __name__ == "__main__":
