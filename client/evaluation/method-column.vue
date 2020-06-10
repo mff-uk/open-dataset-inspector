@@ -6,7 +6,16 @@
         :rules="[rules.required, rules.number]"
         label="Order"
         @input="onChangeRating"
-      />
+      >
+        <template v-slot:append-outer>
+          <v-btn
+            icon
+            @click="onCopyRating"
+          >
+            <v-icon>mdi-arrow-expand-right</v-icon>
+          </v-btn>
+        </template>
+      </v-text-field>
     </div>
     <div class="datasets">
       <div
@@ -51,6 +60,9 @@ export default {
         return;
       }
       this.$emit("change-rating", Number(value) - 1);
+    },
+    "onCopyRating": function () {
+      this.$emit("copy-rating", this.rating);
     },
   },
 };

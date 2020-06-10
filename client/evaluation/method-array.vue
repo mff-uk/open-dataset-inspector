@@ -7,7 +7,7 @@
       @input="onChangeOrder"
     >
       <v-col
-        v-for="method in methods"
+        v-for="(method, index) in methods"
         :key="method.id"
         xs="12"
         sm="6"
@@ -21,6 +21,7 @@
           :rating="ratings[method.id]"
           :highlights="highlights"
           @change-rating="(value) => onChangeMethodRating(method, value)"
+          @copy-rating="(value) => onCopyMethodRating(index, value)"
         />
       </v-col>
     </draggable>
@@ -59,6 +60,12 @@ export default {
     "onChangeMethodRating": function (method, value) {
       this.$emit("change-method-rating", {
         "method": method,
+        "value": value,
+      });
+    },
+    "onCopyMethodRating": function (index, value) {
+      this.$emit("copy-rating", {
+        "from": index,
         "value": value,
       });
     },

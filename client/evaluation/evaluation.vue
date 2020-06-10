@@ -17,6 +17,7 @@
       :ratings="ratings"
       @change-order="onChangeOrder"
       @change-method-rating="onChangeMethodRating"
+      @copy-rating="onCopyMethodRating"
     />
     <div class="d-flex flex-row-reverse footer">
       <v-btn
@@ -175,6 +176,20 @@ export default {
       };
       //
       this.onSubmit("change-method-order-number");
+    },
+    "onCopyMethodRating": function (event) {
+      const methodsToSet = [];
+      for (let index = event.from; index < this.methods.length; index += 1) {
+        methodsToSet.push(this.methods[index].id);
+      }
+      const newRatings = {
+        ...this.ratings,
+      };
+      for (const method of methodsToSet) {
+        newRatings[method] = event.value;
+      }
+      this.ratings = newRatings;
+      this.onSubmit("copy-method-rating");
     },
     "onSearch": function (search) {
       this.query = {
