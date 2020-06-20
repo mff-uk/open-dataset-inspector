@@ -1,69 +1,19 @@
 <template>
-  <v-speed-dial
-    v-model="showSpeedDial"
-    transition="scale-transition"
-    open-on-hover
-    persistent
+  <v-btn
+    color="blue darken-2"
+    dark
+    fab
+    @click="$emit('show-options-dialog')"
   >
-    <template v-slot:activator>
-      <v-btn
-        v-model="showSpeedDial"
-        color="blue darken-2"
-        dark
-        fab
-      >
-        <v-icon v-if="showSpeedDial">
-          mdi-close
-        </v-icon>
-        <v-icon v-else>
-          mdi-settings
-        </v-icon>
-      </v-btn>
-    </template>
-    <v-btn
-      v-tippy="{ 'placement' : 'left' }"
-      fab
-      dark
-      color="blue"
-      content="Open mapping dialog"
-      @click="$emit('show-mapping-dialog')"
-    >
-      <v-icon dark>
-        mdi-decagram
-      </v-icon>
-    </v-btn>
-    <v-btn
-      v-tippy="{ 'placement' : 'left' }"
-      fab
-      dark
-      color="blue"
-      content="Open similarity dialog"
-      @click="$emit('show-similarity-dialog')"
-    >
-      <v-icon dark>
-        mdi-decagram
-      </v-icon>
-    </v-btn>
-    <v-btn
-      v-tippy="{ 'placement' : 'left' }"
-      fab
-      dark
-      color="blue"
-      content="Open highlight dialog"
-      @click="$emit('show-highlight-dialog')"
-    >
-      <v-icon dark>
-        mdi-decagram
-      </v-icon>
-    </v-btn>
-  </v-speed-dial>
+    <v-icon>
+      mdi-settings
+    </v-icon>
+  </v-btn>
 </template>
 
 <script>
 export default {
   "name": "options-menu",
-  "data": () => ({
-    "showSpeedDial": false,
-  }),
+  "data": () => ({}),
 };
 </script>

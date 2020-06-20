@@ -24,20 +24,20 @@ export interface Path {
 
 export function createDefaultMappingOptions() : MappingFilterOptions {
   return {
-    "directlyMapped": true,
+    "directlyMapped": false,
   };
 }
 
 export function createDefaultHighlightFilterOptions() : HighlightFilterOptions {
   return {
-    "usedInPaths": true,
+    "usedInPaths": false,
   }
 }
 
 export function createDefaultPathOptions() : PathOptions {
   return {
     "method": "distance",
-    "distance": 1,
+    "distance": 99,
     "autoFetch": true,
   }
 }
@@ -52,7 +52,7 @@ export function createMappingFilters(options: MappingFilterOptions) {
   if (options.compiledUserFilterFunction) {
     filters.push(options.compiledUserFilterFunction);
   }
-
+  console.log("createMappingFilters", options);
   return (mappings: any[]) => {
     return mappings.map((mapping: any) => {
       return {

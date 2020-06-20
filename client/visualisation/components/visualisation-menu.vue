@@ -28,19 +28,7 @@
       @click="$emit('input', 0)"
     >
       <v-icon dark>
-        mdi-decagram
-      </v-icon>
-    </v-btn>
-    <v-btn
-      v-tippy="{ 'placement' : 'left' }"
-      fab
-      dark
-      color="blue"
-      content="Use circle visualisation"
-      @click="$emit('input', 1)"
-    >
-      <v-icon dark>
-        mdi-decagram
+        mdi-lan
       </v-icon>
     </v-btn>
     <v-btn
@@ -52,7 +40,19 @@
       @click="$emit('input', 2)"
     >
       <v-icon dark>
-        mdi-decagram
+        mdi-file-tree
+      </v-icon>
+    </v-btn>
+    <v-btn
+      v-tippy="{ 'placement' : 'left' }"
+      fab
+      dark
+      color="blue"
+      content="Use circle visualisation"
+      @click="$emit('input', 1)"
+    >
+      <v-icon dark>
+        mdi-google-circles-communities
       </v-icon>
     </v-btn>
   </v-speed-dial>

@@ -264,7 +264,6 @@ function clearSimilarity(state) {
 }
 
 function setSimilarity(state, event) {
-  console.log("S", event.similarity);
   state.similarity = {
     "fetched": true,
     "loading": false,

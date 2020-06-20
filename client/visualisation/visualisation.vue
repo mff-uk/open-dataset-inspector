@@ -16,7 +16,7 @@
       :similarity-options="similarityOptions"
       @add-dataset="showDatasetDialog = true"
       @remove-dataset="onRemoveDataset"
-      @show-similarity-dialog="showSimilarityDialog = true"
+      @show-similarity-dialog="onShowSimilarityDialog"
     />
     <similarity-visualisation
       v-if="activeView > 0"
@@ -29,9 +29,7 @@
     <div style="bottom: 1rem; right: 2.5rem; position: fixed;">
       <v-row>
         <options-menu
-          @show-mapping-dialog="showMappingDialog = true"
-          @show-similarity-dialog="showSimilarityDialog = true"
-          @show-highlight-dialog="showHighlightDialog = true"
+          @show-options-dialog="showOptionsDialog = true"
         />
         &nbsp;
         <visualisation-menu
@@ -44,24 +42,15 @@
       @accept="addDataset"
       @reject="showDatasetDialog = false"
     />
-    <mapping-dialog
-      :visible="showMappingDialog"
-      :options="mappingOptions"
-      @accept="changeMappingOptions"
-      @reject="showMappingDialog = false"
-    />
-    <similarity-dialog
-      :visible="showSimilarityDialog"
-      :options="similarityOptions"
+    <options-dialog
+      ref="optionsDialog"
+      :visible="showOptionsDialog"
+      :highlight="highlightOptions"
+      :mapping="mappingOptions"
+      :similarity="similarityOptions"
       :dataset-count="datasets.length"
-      @accept="changePathOptions"
-      @reject="showSimilarityDialog = false"
-    />
-    <highlight-dialog
-      :visible="showHighlightDialog"
-      :options="highlightOptions"
-      @accept="changeHighlightOptions"
-      @reject="showHighlightDialog = false"
+      @accept="onChangeOptions"
+      @reject="showOptionsDialog = false"
     />
   </v-container>
 </template>
@@ -71,7 +60,6 @@ import { mapGetters } from "vuex";
 
 import NetworkVisualisation from "./network/network-visualisation.vue";
 import AddDatasetDialog from "./components/add-dataset-dialog.vue";
-import MappingFilterDialog from "./components/mapping-options-dialog.vue";
 import {
   ADD_DATASET,
   REMOVE_DATASET,
@@ -94,8 +82,7 @@ import {
   createDefaultMappingOptions,
   createDefaultHighlightFilterOptions,
 } from "./visualisation-service.ts";
-import SimilarityDialog from "./components/similarity-options-dialog.vue";
-import HighlightDialog from "./components/highlight-options-dialog.vue";
+import OptionsDialog from "./components/options-dialog.vue";
 import OptionsMenu from "./components/options-menu.vue";
 import VisualisationMenu from "./components/visualisation-menu.vue";
 
@@ -105,17 +92,13 @@ export default {
     "dataset-dialog": AddDatasetDialog,
     "network-visualisation": NetworkVisualisation,
     "similarity-visualisation": SimilarityVisualisation,
-    "mapping-dialog": MappingFilterDialog,
-    "similarity-dialog": SimilarityDialog,
-    "highlight-dialog": HighlightDialog,
+    "options-dialog": OptionsDialog,
     "options-menu": OptionsMenu,
     "visualisation-menu": VisualisationMenu,
   },
   "data": () => ({
     "showDatasetDialog": false,
-    "showMappingDialog": false,
-    "showSimilarityDialog": false,
-    "showHighlightDialog": false,
+    "showOptionsDialog": false,
     //
     "activeView": 0,
     "mappingOptions": createDefaultMappingOptions(),
@@ -157,35 +140,30 @@ export default {
       //
       this.$store.dispatch(ADD_DATASET, dataset);
     },
+    "onShowSimilarityDialog": function () {
+      this.$refs.optionsDialog.setTab(2);
+      this.showOptionsDialog = true;
+    },
     "onRemoveDataset": function (dataset) {
       this.$store.dispatch(REMOVE_DATASET, dataset);
     },
-    "onSetPaths": function () {
-      this.showSimilarityDialog = true;
-    },
-    "changePathOptions": function (options) {
-      this.showSimilarityDialog = false;
+    "onChangeOptions": function (event) {
+      this.showOptionsDialog = false;
       //
-      this.$store.dispatch(SET_SIMILARITY_OPTIONS, options);
+      this.$store.dispatch(SET_SIMILARITY_OPTIONS, event.similarity);
       if (this.datasets.length === 2) {
         this.$store.dispatch(FETCH_SIMILARITY, {
           "datasets": [this.datasets[0], this.datasets[1]],
         });
       }
-    },
-    "changeHighlightOptions": function (options) {
-      this.showHighlightDialog = false;
       //
-      this.highlightOptions = options;
-    },
-    "changeMappingOptions": function (options) {
-      this.showMappingDialog = false;
-      //
-      this.mappingOptions = options;
+      this.mappingOptions = event.mapping;
       this.$store.dispatch(
         SET_MAPPING_OPTIONS,
         createMappingFilters(this.mappingOptions)
       );
+      //
+      this.highlightOptions = event.highlight;
     },
   },
 };

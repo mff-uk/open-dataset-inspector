@@ -35,35 +35,26 @@
               <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title>
-                    Number of all paths
+                    Number of all/used paths
                   </v-list-item-title>
                   <v-list-item-content class="similarity-item">
                     {{ similarity.metadata.totalPathCount }}
-                  </v-list-item-content>
-                </v-list-item-content>
-              </v-list-item>
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-title>
-                    Number of used paths ( shorter then
-                    {{ similarityOptions.distance }} )
-                  </v-list-item-title>
-                  <v-list-item-content class="similarity-item">
+                    /
                     {{ similarity.metadata.resultPathCount }}
                   </v-list-item-content>
                 </v-list-item-content>
               </v-list-item>
-
               <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title>
-                    Similarity score (min ; average ; max ; sum)
+                    Similarity score <br/>
+                    (min / average / max / sum)
                   </v-list-item-title>
                   <v-list-item-content class="similarity-item">
-                    {{ similarity.similarity.min }} ;
-                    {{ similarity.similarity.average }} ;
-                    {{ similarity.similarity.max }} ;
-                    {{ similarity.similarity.sum }}
+                    {{ similarity.similarity.min.toFixed(2) }} /
+                    {{ similarity.similarity.average.toFixed(2) }} /
+                    {{ similarity.similarity.max.toFixed(2) }} /
+                    {{ similarity.similarity.sum.toFixed(2) }}
                   </v-list-item-content>
                 </v-list-item-content>
               </v-list-item>
@@ -103,7 +94,6 @@
                   </v-btn>
                 </v-list-item-title>
                 <v-list-item-content>
-                  {{ dataset.collection }}
                   <div v-if="dataset.loaded && mappings[dataset.url]">
                     <v-switch
                       v-model="mappings[dataset.url].showTitle"
