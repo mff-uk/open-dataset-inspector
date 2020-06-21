@@ -12,6 +12,7 @@
         :cy="nodeData.y"
         :fill="nodeData.fill"
         :stroke="nodeData.stroke"
+        :stroke-width="nodeData.strokewidth"
         @click.exact="emit(nodeData)"
         @click.ctrl="openWiki(nodeData)"
     >

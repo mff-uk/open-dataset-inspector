@@ -270,19 +270,32 @@ export function packMappingArrows (height: number, width: number, circles: Array
   return result
 }
 
+function mappingsIntersection (leftMappingNodes: Array<ArrowData>, rightMappingNodes: Array<ArrowData>) {
+  return leftMappingNodes.filter(n => rightMappingNodes.some(n2 => n.id == n2.id))
+}
+
 export function highlightTreeMapping (circles: Array<Circle>, leftMappingNodes: Array<ArrowData>, rightMappingNodes: Array<ArrowData>) {
+
+  const intersection = mappingsIntersection(leftMappingNodes, rightMappingNodes)
   for (let i = 0; i < leftMappingNodes.length; i++) {
     const targetCircle = getCircleById(circles, leftMappingNodes[i].id)
     if (targetCircle !== undefined) {
       targetCircle.fill = 'red'
-      targetCircle.r += 2
     }
   }
   for (let i = 0; i < rightMappingNodes.length; i++) {
     const targetCircle = getCircleById(circles, rightMappingNodes[i].id)
     if (targetCircle !== undefined) {
-      targetCircle.fill = 'red'
-      targetCircle.r += 2
+      targetCircle.fill = 'blue'
+    }
+  }
+
+  for (let i = 0; i < intersection.length; i++) {
+    const targetCircle = getCircleById(circles, intersection[i].id)
+    if (targetCircle !== undefined) {
+      targetCircle.fill = 'blue'
+      targetCircle.strokewidth = '7'
+      targetCircle.stroke = 'red'
     }
   }
 }

@@ -2,6 +2,8 @@ export class Circle {
     id: string;
     key: number;
     fill?: string;
+    strokewidth?: string;
+    stroke?: string;
     pathNr?: number;
     label: string;
     isLeaf: boolean;
