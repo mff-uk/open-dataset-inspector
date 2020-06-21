@@ -1,5 +1,6 @@
 import { ROOT_ID, Node, Link, Circle, Arrow, TREE_CIRCLE_RADIUS, ComboboxItem, Labels } from '../models'
 import * as d3 from 'd3'
+import { createArrayFromHierarchy } from './hierarchyUtils'
 
 function stringArrayContainsNodeById (array: Array<string>, id: string) {
   if (array.includes(id)) {
@@ -113,8 +114,11 @@ export function packNodes (height: number, width: number, root: Node, maxDepth: 
   const circles = new Array<Circle>()
   const margin = 0
   const packChart = d3.pack()
+  const arrayOfNodes = createArrayFromHierarchy(root)
+  let padding = 0
+  arrayOfNodes.length < 6 ? arrayOfNodes.length === 2 ? padding = 200 : padding = 40 : padding = 7
   packChart.size([width - margin, height - margin])
-  packChart.padding(7)
+  packChart.padding(padding)
   const treeRoot = d3.hierarchy(root)
     .sum((d: any) => Math.sqrt(d.value))
 
