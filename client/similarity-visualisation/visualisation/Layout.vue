@@ -83,6 +83,7 @@ export default Vue.extend({
     ...mapActions(STORE_NAME, {
       createHierarchyForCircles: Actions.CREATE_HIERARCHY_FOR_CIRCLES,
       createHierarchyForTree: Actions.CREATE_HIERARCHY_FOR_TREE,
+      createPathHierarchyForTree: Actions.CREATE_PATH_HIERARCHY_FOR_TREE,
       updateCircleCanvas: Actions.UPDATE_CIRCLE_CANVAS,
       updateTreeCanvas: Actions.UPDATE_TREE_CANVAS,
       selectPath: Actions.SELECT_PATH
@@ -111,7 +112,7 @@ export default Vue.extend({
           this.updateCircleCanvas()
           break
         case 2:
-          this.createHierarchyForTree(this.activePath.height)
+          this.createHierarchyForTree(MAX_TREE_DEPTH)
           this.updateTreeCanvas()
           break
         }
@@ -163,7 +164,7 @@ export default Vue.extend({
           this.updateCircleCanvas()
           break
         case 2:
-          this.createHierarchyForTree(height)
+          this.createPathHierarchyForTree()
           this.updateTreeCanvas()
           break
       }

@@ -71,7 +71,7 @@ export default Vue.extend({
       this.keywords.forEach((element: string) => {
         result = element + '  ' + result
       })
-      console.log(result)
+      //console.log(result)
       return result
     }
   },

@@ -1,5 +1,5 @@
 import { ROOT_LABEL, ROOT_ID, MAX_DEPTH, MappingNode, Labels, Node, Circle, Arrow, Position, Path, ComboboxItem, MAX_TREE_DEPTH } from '../models'
-import { createTree, createLayer, getMaxTreeDepth, packMappingArrows, appendNode, createArrayFromHierarchy, highlightTreeMapping } from '../utils/hierarchyUtils'
+import { createTree, createLayer, getMaxTreeDepth, packMappingArrows, appendNode, createArrayFromHierarchy, highlightTreeMapping, collapseIrrelevantSubtrees } from '../utils/hierarchyUtils'
 import { packNodes, packTreeHierarchy, getNodeByKey, createVisitedNode, getNodeLabel } from '../utils/nodesUtils'
 import { highlightPaths, createPathNodes } from '../utils/pathUtils'
 import { VisitedNode } from '../models/VisitedNode'
@@ -17,7 +17,8 @@ export const Actions = {
   SELECT_PATH: 'SELECT_PATH',
   APPEND_NODE_TREE: 'APPEND_NODE_TREE',
   CUT_NODE_TREE_CHILDREN: 'CUT_NODE_TREE_CHILDREN',
-  INIT_PATH_NODES: 'INIT_PATH_NODES'
+  INIT_PATH_NODES: 'INIT_PATH_NODES',
+  CREATE_PATH_HIERARCHY_FOR_TREE: 'CREATE_PATH_HIERARCHY_FOR_TREE'
 }
 
 export const Mutations = {
@@ -272,8 +273,25 @@ export default {
     [Actions.SELECT_PATH]: selectPath,
     [Actions.APPEND_NODE_TREE]: appendNodeTree,
     [Actions.CUT_NODE_TREE_CHILDREN]: cutNodeTreeChildren,
-    [Actions.INIT_PATH_NODES]: initPathNodes
+    [Actions.INIT_PATH_NODES]: initPathNodes,
+    [Actions.CREATE_PATH_HIERARCHY_FOR_TREE]: createPathHierarchyForTree
   }
+}
+
+function createPathHierarchyForTree (context: any) {
+  const activePath: Path = context.getters[Getters.GET_ACTIVE_PATH]
+  if (context.state.nodes.length === 0) {
+    return undefined
+  } else {
+    if (activePath !== undefined) {
+      context.commit(Mutations.CHANGE_TREE_HIERARCHY, collapseIrrelevantSubtrees(createTree(context.state.rootId,
+        context.state.nodes, activePath.height), activePath.vertices))
+      context.commit(Mutations.CHANGE_TREE_HEIGHT, activePath.height)
+    } else {
+      context.commit(Mutations.CHANGE_TREE_HIERARCHY, createTree(context.state.rootId, context.state.nodes, MAX_TREE_DEPTH))
+      context.commit(Mutations.CHANGE_TREE_HEIGHT, MAX_TREE_DEPTH)
+    }    
+  }  
 }
 
 function initPathNodes (context: any) {

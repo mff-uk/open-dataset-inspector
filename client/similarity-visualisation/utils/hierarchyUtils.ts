@@ -115,6 +115,26 @@ function setNodeAsLeaf (node: Node) {
   node.isLeaf = true
 }
 
+export function collapseIrrelevantSubtrees (root: Node, vertices: string[]) {
+  const queue = Array<Node>()
+  queue.push(root)
+  while (queue.length !== 0) {
+    const vertex = queue.shift()
+    if (vertex !== undefined) {
+      if (vertices.includes(vertex.id)) {
+        if (vertex.children !== undefined && vertex.children !== null) {
+          for (let i = 0; i < vertex.children.length; i++) {
+            queue.push(vertex.children[i])
+          }
+        }
+      } else {
+        setNodeAsLeaf(vertex)
+      }
+    }
+  }
+  return root
+}
+
 export function createTree (rootId: string, nodes: Array<Node>, depth: number) {
   resetNodeDepths(nodes)
   const root = getNodeById(nodes, rootId)
