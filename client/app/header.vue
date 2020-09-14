@@ -25,6 +25,12 @@
     >
       Visualisation
     </v-btn>
+    <v-btn
+      :to="{'name':'tutorial'}"
+      text
+    >
+      Tutorial
+    </v-btn>
   </v-app-bar>
 </template>
 
