@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+# Produce evaluation-reports-summary.json file .
+#
 
 import os
 import json
@@ -67,26 +70,33 @@ class EvaluationStatistics:
 
 
 def main():
-    evaluations = load_evaluations()
+    evaluate_iiwas_2020()
+
+
+def evaluate_iiwas_2020():
+    evaluation_directory = "../data/evaluation-reports-archive/20200621"
+    evaluations = load_evaluations(evaluation_directory)
     evaluations = [item for item in evaluations
                    if item.user not in ["Test", "MaNe"]]
     evaluations = normalize_with_respect_to_method(
         evaluations, "nkod-_title_description_.join.reduce.tlsh.tlsh")
     evaluations = keep_last_submits(evaluations)
 
-    export_evaluations(evaluations, "../data/evaluation-reports-summary.json")
+    export_evaluations(
+        evaluations,
+        "../data/evaluation-reports-archive/"
+        "20200621-evaluation-reports-summary.json"
+    )
 
-    print("# ALL")
     evaluate_and_print(evaluations)
 
     for user, user_evaluations in iterate_per_user(evaluations):
-        print()
         print("# user:", user, "count:", len(user_evaluations))
         evaluate_and_print(user_evaluations)
 
 
-def load_evaluations() -> typing.List[RawEvaluationSubmit]:
-    evaluation_directory = "../data/evaluation-reports"
+def load_evaluations(
+        evaluation_directory: str) -> typing.List[RawEvaluationSubmit]:
     result = []
     for file_name in os.listdir(evaluation_directory):
         file_path = os.path.join(evaluation_directory, file_name)
@@ -154,9 +164,10 @@ def normalize_with_respect_to_method(
     result = []
     for item in data:
         baseline = item.raw_rating[method]
-        min_value = min(item.raw_rating.values()) - baseline
-        max_value = max(item.raw_rating.values()) - baseline
-        scale = max(abs(max_value), abs(min_value))
+        scale = max([
+            abs(value - baseline)
+            for value in item.raw_rating.values()
+        ])
 
         def normalize(value: float) -> float:
             """

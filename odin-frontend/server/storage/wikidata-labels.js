@@ -11,7 +11,9 @@ const wikidataLabels = {};
 }());
 
 function loadAllLabels() {
-  const filePath = path.join(config.data, "wikidata", "labels-cs.jsonl");
+  const filePath = path.join(
+    config.data, "www.wikidata.org", "wikidata-labels-en.jsonl"
+  );
   const readInterface = readline.createInterface({
     "input": fs.createReadStream(filePath),
   });

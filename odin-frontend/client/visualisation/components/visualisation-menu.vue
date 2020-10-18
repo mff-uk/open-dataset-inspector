@@ -24,7 +24,7 @@
       fab
       dark
       color="blue"
-      content="Use network visualisation"
+      content="Network visualisation"
       @click="$emit('input', 0)"
     >
       <v-icon dark>
@@ -36,7 +36,7 @@
       fab
       dark
       color="blue"
-      content="Use tree visualisation"
+      content="Horizontal tree visualisation"
       @click="$emit('input', 2)"
     >
       <v-icon dark>
@@ -48,7 +48,7 @@
       fab
       dark
       color="blue"
-      content="Use circle visualisation"
+      content="Vertical tree visualisation"
       @click="$emit('input', 1)"
     >
       <v-icon dark>

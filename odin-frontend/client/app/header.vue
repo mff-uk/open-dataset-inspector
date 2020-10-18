@@ -25,6 +25,13 @@
     >
       Visualisation
     </v-btn>
+    <v-spacer />
+    <v-btn
+      :to="{'name':'help'}"
+      icon
+    >
+      <v-icon>mdi-help</v-icon>
+    </v-btn>
   </v-app-bar>
 </template>
 
