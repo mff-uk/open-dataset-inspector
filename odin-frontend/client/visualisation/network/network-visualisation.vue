@@ -47,7 +47,7 @@
               <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title>
-                    Similarity score <br/>
+                    Similarity score <br>
                     (min / average / max / sum)
                   </v-list-item-title>
                   <v-list-item-content class="similarity-item">

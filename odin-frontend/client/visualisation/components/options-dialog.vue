@@ -25,14 +25,14 @@
             Similarity
           </v-tab>
           <v-tab-item>
-            <br/>
+            <br>
             <v-switch
               v-model="localHighlight.usedInPaths"
               label="Show only nodes used in paths if paths are available"
             />
           </v-tab-item>
           <v-tab-item>
-            <br/>
+            <br>
             <v-switch
               v-model="localMapping.directlyMapped"
               label="Keep only directly mapped"
@@ -44,7 +44,7 @@
             />
           </v-tab-item>
           <v-tab-item>
-            <br/>
+            <br>
             <v-alert
               v-show="datasetCount !== 2"
               outlined

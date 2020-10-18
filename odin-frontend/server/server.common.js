@@ -1,9 +1,9 @@
 const bodyParser = require("body-parser");
 const express = require("express");
 const path = require("path");
+const request = require("request");
 const { logger } = require("./logging");
 const config = require("./configuration");
-const request = require("request");
 
 const { streamDataset } = require("./storage/dataset");
 const { entitiesToLabel } = require("./storage/wikidata-labels");
