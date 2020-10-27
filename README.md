@@ -1,6 +1,6 @@
 # Open Dataset Inspector (ODIN)
 This is a tool used for exploration and evaluation of various search methods for finding datasets in open data portals.
-See [documentation](documentation/README.md) for more details.
+See [documentation](documentation) for more details.
 
 ![Evaluation in ODIN](documentation/images/evaluation-screenshot.png)
 
