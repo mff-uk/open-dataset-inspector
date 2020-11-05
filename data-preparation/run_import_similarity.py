@@ -95,7 +95,7 @@ def convert(
     write_csv(output_path, ["iri"], [[iri] for iri in iris])
 
 
-@functools.lru_cache
+@functools.lru_cache(maxsize=6)
 def load_json(path):
     with open(path, encoding="utf-8") as stream:
         return json.load(stream)
