@@ -1,6 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+#
 #
 # Collect all entities in mapped hierarchy and extract labels for them.
 # The extracted labels are used in frontend.

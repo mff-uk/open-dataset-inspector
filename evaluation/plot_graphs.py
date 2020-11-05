@@ -4,7 +4,6 @@
 import collections
 import json
 import os
-from pprint import pprint
 
 import numpy
 
@@ -96,7 +95,7 @@ METHOD_METADATA = {
     },
 }
 
-PLOT_EXTENSION = "png"
+PLOT_EXTENSION = "pdf"
 
 
 def main():
@@ -200,17 +199,13 @@ def on_plot_ready(figure, file_name, description, width=1024, height=768):
         figure_path + "." + PLOT_EXTENSION,
         width=width,
         height=height)
-    # if not os.path.exists(figure_path + ".html"):
-    #     figure.write_html(figure_path + ".html")
-    # if not os.path.exists(figure_path + "." + PLOT_EXTENSION) or True:
-    #     figure.write_image(
-    #         figure_path + "." + PLOT_EXTENSION,
-    #         width=width,
-    #         height=height)
-    # with open(os.path.join(OUTPUT_ROOT, "index.html"), "a") as stream:
-    #     stream.write(
-    #         '<li><a href="./evaluation-reports-graphs/{}">{}</a></li>'.format(
-    #             file_name + ".html", description))
+    # Save as HTML file to allow web-based browsing of the data.
+    if not os.path.exists(figure_path + ".html"):
+        figure.write_html(figure_path + ".html")
+    with open(os.path.join(OUTPUT_ROOT, "index.html"), "a") as stream:
+        stream.write(
+            '<li><a href="./evaluation-reports-graphs/{}">{}</a></li>'.format(
+                file_name + ".html", description))
 
 
 def finalize_index():

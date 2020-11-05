@@ -20,7 +20,7 @@ Graph produced for directories in ```evaluation-reports-archive```.
 Contains input files almost as provided by the external source. 
 * ```wikidata-cs.jsonl``` - Czech titles of wikidata entities.
 * ```wikidata-cs-en.jsonl``` - English titles of wikidata entities.
-* ```wikidata-hierarchy.jsonl``` - File with all *instanof* and *subclassof* edges.
+* ```wikidata-hierarchy.jsonl``` - File with all *instanceof* and *subclassof* edges.
 * ```2020.04.20-www.data.gov.cz.trig``` - Dump with all relevant datasets metadata.
 
 ## mapping
@@ -29,6 +29,9 @@ Content is copy of something in ```working``` directory.
 
 ## similarities
 Similarities of datasets by given method, used for user-based evaluation.
+
+## similarities-matrix
+Computed similarity matrices, provided by external source. 
 
 ## udpipe
 Files required to run udpipe.

@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Export mapping created by `run_mapping_workflow.python` into CSV files, so
-# they can be consume by other tools.
+# Export mapping created by `run_mapping_workflow.py` into CSV files, so
+# they can be consume by other tools. This was originally designed to export
+# mapping for David.
 #
 # We export only final reduced mapping.
 #

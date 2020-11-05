@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import json
 
 import yaml
 from flask import Flask, request, jsonify
