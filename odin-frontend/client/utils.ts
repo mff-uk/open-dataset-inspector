@@ -1,4 +1,4 @@
-export function queryParamsToDatasetString(value: string | string []): string {
+export function queryParamsToText(value: string | string []): string {
   if (value === undefined) {
     return "";
   }
@@ -8,7 +8,7 @@ export function queryParamsToDatasetString(value: string | string []): string {
   return value;
 }
 
-export function datasetStringToArray(
+export function textToArray(
   datasetString: string | undefined): string[] {
   if (datasetString === undefined) {
     return [];

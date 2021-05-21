@@ -7,7 +7,7 @@ export interface Dataset {
   keywords: string[];
 }
 
-export function getDataset(datasetIri: string): Promise<Dataset> {
+export function fetchDataset(datasetIri: string): Promise<Dataset> {
   const url = "./api/v1/dataset?dataset=" + encodeURIComponent(datasetIri);
   return axios.get(url).then((response) => response.data);
 }

@@ -1,23 +1,14 @@
 const bodyParser = require("body-parser");
 const express = require("express");
-const path = require("path");
 const request = require("request");
 const { logger } = require("./logging");
 const config = require("./configuration");
 
 const { streamDataset } = require("./storage/dataset");
-const { entitiesToLabel } = require("./storage/wikidata-labels");
-const { streamEvaluationGroup } = require("./storage/evaluation");
-const {
-  streamSimilarToDataset,
-  streamPositionOfDatasets,
-} = require("./storage/similarities");
-const {
-  streamMappingDataset,
-  streamMappingCollections,
-} = require("./storage/mapping");
-
-const { jsonToFile } = require("./utils");
+const evaluation = require("./storage/evaluation");
+const similarity = require("./storage/similarities");
+const explanation = require("./storage/explanation");
+const knowledge = require("./storage/knowledge");
 
 function initializeHttp(app) {
   app.use("/api/v1", createHttpApi());
@@ -30,17 +21,34 @@ function createHttpApi() {
     (req, res) => streamDataset(res, req.query.dataset)
   );
   router.post(
-    "/wikidata/labels",
-    bodyParser.json(),
-    (req, res) => entitiesToLabel(res, req.body)
+    "/knowledge/:name/labels",
+    bodyParser.json({ "limit": "16kb" }),
+    (req, res) => knowledge.streamLabels(res, req.params.name, req.body)
   );
   router.get(
     "/evaluation/:group",
-    (req, res) => streamEvaluationGroup(res, req.params.group)
+    (req, res) => evaluation.streamEvaluationGroup(res, req.params.group)
+  );
+  router.post(
+    "/evaluation",
+    bodyParser.json({ "limit": "64kb" }),
+    evaluation.postEvaluation
   );
   router.get(
-    "/similarity/similar/:similarity",
-    (req, res) => streamSimilarToDataset(
+    "/similarity",
+    (req, res) => explanation.streamMetadata(res)
+  );
+  router.get(
+    "/similarity/explain/:similarity/",
+    (req, res) => explanation.streamExplanation(
+      res,
+      req.params.similarity,
+      req.query.dataset
+    )
+  );
+  router.get(
+    "/similarity/search/:similarity",
+    (req, res) => similarity.streamSimilarToDataset(
       res,
       req.params.similarity,
       req.query.query,
@@ -50,7 +58,7 @@ function createHttpApi() {
   );
   router.get(
     "/similarity/position/:similarity",
-    (req, res) => streamPositionOfDatasets(
+    (req, res) => similarity.streamPositionOfDatasets(
       res,
       req.params.similarity,
       req.query.query,
@@ -59,60 +67,22 @@ function createHttpApi() {
     )
   );
   router.post(
-    "/evaluation",
-    bodyParser.json({ "limit": "64kb" }),
-    onPostEvaluation
-  );
-  router.get(
-    "/mapping/:collection",
-    (req, res) => streamMappingDataset(
-      res,
-      req.params.collection,
-      req.query.dataset
-    )
-  );
-  router.get(
-    "/mapping",
-    (req, res) => streamMappingCollections(res)
-  );
-  // curl -X POST -F "dataset=@000001.json" -F "dataset=@000005.json"
-  //  -F 'options={"method": "closest"}'
-  //  localhost:8065/api/v1/mapping-similarity
-  router.post(
-    "/mapping-similarity",
-    (req, res) => {
-      const url = `http://localhost:${config.pathServicePort}/`;
-      req.pipe(
-        request.post(url, { "form": req.body }),
-        { "end": false }
-      ).pipe(res);
-    }
+    "/backend/graph-similarity",
+    (req, res) => proxyToBackend("graph-similarity", req, res)
   );
   return router;
 }
 
-function onPostEvaluation(req, res) {
-  const task = req.body.task;
-  let filePath;
-  try {
-    const time = (new Date()).getTime();
-    const fileName = `${time}-${task.session}-${task.index}.json`;
-    filePath = path.join(config.data, "evaluation-reports", fileName);
-  } catch (error) {
-    logger.error("Invalid data.", { "error": error });
-    res.status(500).send("");
-    return;
-  }
-  jsonToFile(req.body, filePath)
-    .then(() => res.status(200).send(""))
-    .catch((error) => {
-      logger.error("Can't save report.", { "error": error });
-      res.status(500).send("");
-    });
+function proxyToBackend(path, req, res) {
+  const url = `http://localhost:${config.backendPort}/${path}`;
+  req.pipe(
+    request.post(url, { "form": req.body }),
+    { "end": false }
+  ).pipe(res);
 }
 
 function start(app) {
-  const port = config.servicePort;
+  const port = config.frontendPort;
   app.listen(port, (error) => {
     if (error) {
       logger.error("Can't start HTTP server.", { "error": error });

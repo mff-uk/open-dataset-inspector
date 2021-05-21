@@ -8,22 +8,25 @@
       Open Dataset Inspector
     </v-toolbar-title>
     <v-btn
+      :to="{'name':'search'}"
+      class="mx-2"
+      text
+    >
+      Search
+    </v-btn>
+    <v-btn
+      :to="{'name':'similarity-explanation'}"
+      class="mx-2"
+      text
+    >
+      Explain
+    </v-btn>
+    <v-btn
       :to="{'name':'evaluation'}"
+      class="mx-2"
       text
     >
-      Evaluation
-    </v-btn>
-    <v-btn
-      :to="{'name':'exploration'}"
-      text
-    >
-      Exploration
-    </v-btn>
-    <v-btn
-      :to="{'name':'visualisation'}"
-      text
-    >
-      Visualisation
+      Evaluate
     </v-btn>
     <v-spacer />
     <v-btn

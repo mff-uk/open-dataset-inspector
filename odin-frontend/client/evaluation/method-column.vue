@@ -26,6 +26,7 @@
           :iri="item.iri"
           :dataset="datasets[item.iri]"
           :background-color="highlights[item.iri]"
+          :languages="languages"
         />
       </div>
     </div>
@@ -33,7 +34,7 @@
 </template>
 
 <script>
-import MethodColumnDataset from "./method-column-dataset.vue";
+import MethodColumnDataset from "../app-components/dataset-card.vue";
 import { required, decimal } from "./validators.ts";
 
 export default {
@@ -46,6 +47,7 @@ export default {
     "datasets": { "type": Object, "required": true },
     "rating": { "type": String, "required": true },
     "highlights": { "type": Object, "required": true },
+    "languages": { "type": Array, "required": true },
   },
   "data": () => ({
     "rules": {

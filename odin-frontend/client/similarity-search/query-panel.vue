@@ -2,10 +2,18 @@
   <v-expansion-panels multiple>
     <v-expansion-panel>
       <v-expansion-panel-header>
-        Group details
+        Methods
       </v-expansion-panel-header>
       <v-expansion-panel-content>
-        {{ description }}
+        <v-select
+          v-model="selectedMethods"
+          :items="methods"
+          item-value="id"
+          item-text="label"
+          chips
+          multiple
+          deletable-chips
+        />
       </v-expansion-panel-content>
     </v-expansion-panel>
     <v-expansion-panel>
@@ -13,17 +21,6 @@
         Query
       </v-expansion-panel-header>
       <v-expansion-panel-content>
-        <v-text-field
-          v-model="group"
-          label="Method group ID"
-        />
-        <v-select
-          v-model="fusion"
-          :items="fusionMethods"
-          item-text="label"
-          item-value="value"
-          label="Fusion method"
-        />
         <v-textarea
           v-model="dataset"
           label="Query datasets"
@@ -34,49 +31,45 @@
           label="expected datasets"
           hint="Dataset IRI"
         />
-        <v-btn
-          style="float:right;"
-          @click="onSearch"
-        >
-          Search
-        </v-btn>
       </v-expansion-panel-content>
+      <v-btn
+        class="ma-4"
+        @click="onSearch"
+      >
+        Search
+      </v-btn>
     </v-expansion-panel>
   </v-expansion-panels>
 </template>
 
 <script>
+import { queryParamsToText, textToArray } from "../utils.ts";
+
 export default {
   "name": "query-panel",
   "props": {
     "query": { "type": Object, "required": true },
-    "description": { "type": String },
+    "methods": { "type": Array },
   },
   "data": () => ({
-    "group": "",
     "dataset": "",
     "expected": "",
-    "fusion": "max",
-    "fusionMethods": [
-      { "label": "Max-fusion", "value": "max" },
-      { "label": "Min-fusion", "value": "min" },
-    ],
+    "selectedMethods": [],
   }),
   "watch": {
     "query": function (query) {
-      this.group = query.group;
-      this.dataset = query.dataset;
-      this.expected = query.expected;
-      this.fusion = query.fusion;
+      this.dataset = queryParamsToText(query.dataset);
+      this.expected = queryParamsToText(query.expected);
+      this.selectedMethods = query.method;
     },
   },
   "methods": {
     "onSearch": function () {
       this.$emit("search", {
-        "group": this.group,
-        "dataset": this.dataset,
-        "expected": this.expected,
-        "fusion": this.fusion,
+        ...this.query,
+        "dataset": textToArray(this.dataset),
+        "expected": textToArray(this.expected),
+        "method": this.selectedMethods,
       });
     },
   },

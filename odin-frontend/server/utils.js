@@ -6,6 +6,7 @@ module.exports = {
   "jsonToFile": jsonToFile,
   "fileToStream": fileToStream,
   "fileToJson": fileToJson,
+  "fileToJsonAsync": fileToJsonAsync,
   "fileToResponse": fileToResponse,
   "mkDir": mkDir,
   "remove": removeFile,
@@ -34,6 +35,17 @@ function fileToStream(path, stream) {
 
 function fileToJson(path) {
   return JSON.parse(fileSystem.readFileSync(path, "utf8"));
+}
+
+function fileToJsonAsync(path) {
+  return new Promise((resolve, reject) => {
+    fileSystem.readFile(path, "utf8", (error, data) => {
+      if (error) {
+        reject(error);
+      }
+      resolve(JSON.parse(data));
+    });
+  });
 }
 
 function fileToResponse(path, response, type) {

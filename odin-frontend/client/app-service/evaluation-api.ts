@@ -6,9 +6,8 @@ export interface EvaluationGroup {
   fusion?: string;
 }
 
-export function getEvaluationGroup(groupName: string)
-  : Promise<EvaluationGroup> {
-  //
+export function fetchEvaluationGroup(
+  groupName: string): Promise<EvaluationGroup> {
   const url = `./api/v1/evaluation/${groupName}`;
   return axios.get(url).then((response) => response.data);
 }

@@ -1,7 +1,3 @@
-//
-// The "similarities" directory stores distance matrices.
-//
-
 const path = require("path");
 const fileSystem = require("fs");
 const csv = require("csv-parser");
@@ -48,7 +44,7 @@ function getDatasetFiles(similarityName, queryDatasets) {
     .map((iri) => iriToFileName(iri))
     .filter((name) => name !== undefined)
     .map((name) => path.join(
-      config.data, "similarities", similarityName, `${name}.csv`
+      config.data, "similarity", similarityName, `${name}.csv`
     ));
 }
 
@@ -57,7 +53,7 @@ function asArray(value) {
 }
 
 function getIriFile(similarityName) {
-  return path.join(config.data, "similarities", similarityName, "datasets.csv");
+  return path.join(config.data, "similarity", similarityName, "datasets.csv");
 }
 
 function loadIris(iriFile) {
@@ -108,8 +104,8 @@ function datasetsResponse(datasets, queryDatasets, count) {
       "datasets": queryDatasets,
     },
     "datasets": resultDatasets,
-    "numDatasets": datasets.length,
-    "numSameScoreAsLast": countWithThresholdValue,
+    "numberOfDatasets": datasets.length,
+    "numberOfDatasetsWithSameScoreAsTheLast": countWithThresholdValue,
   };
 }
 
@@ -204,7 +200,7 @@ function positionOfDatasetsResponse(
   }
   return {
     "datasets": result,
-    "numDatasets": datasets.length,
+    "totalNumberOfDatasets": datasets.length,
   };
 }
 

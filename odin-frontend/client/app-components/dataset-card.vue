@@ -50,6 +50,17 @@
         mdi-open-in-new
       </v-icon>
     </a>
+    <v-btn
+      v-if="explainable"
+      :to="{
+        'name':'similarity-explanation',
+        'query': {'dataset': [query, iri]}}"
+      class="mx-2"
+      text
+      x-small
+    >
+      Explain
+    </v-btn>
     <div>
       <v-chip
         v-for="keyword in keywords"
@@ -64,26 +75,54 @@
 </template>
 
 <script>
+// Detail of a single dataset.
 export default {
   "name": "method-column-dataset",
   "props": {
+    "query": { "type": String },
     "iri": { "type": String, "required": true },
     "score": { "type": Number },
     "dataset": { "type": Object },
     "backgroundColor": { "type": String },
+    "languages": { "type": Array, "required": true },
+    "explainable": { "type": Boolean, "default": false },
   },
   "data": () => ({
     "showDescriptionDialog": false,
   }),
   "computed": {
     "title": function () {
-      return this.dataset ? this.dataset.title : this.iri;
+      if (this.dataset === undefined) {
+        return this.iri;
+      }
+      for (const language of this.languages) {
+        if (this.dataset.title[language]) {
+          return this.dataset.title[language];
+        }
+      }
+      return this.iri;
     },
     "keywords": function () {
-      return this.dataset ? this.dataset.keywords : [];
+      if (this.dataset === undefined) {
+        return this.iri;
+      }
+      for (const language of this.languages) {
+        if (this.dataset.keywords[language]) {
+          return this.dataset.keywords[language];
+        }
+      }
+      return [];
     },
     "description": function () {
-      return this.dataset ? this.dataset.description : "";
+      if (this.dataset === undefined) {
+        return this.iri;
+      }
+      for (const language of this.languages) {
+        if (this.dataset.description[language]) {
+          return this.dataset.description[language];
+        }
+      }
+      return "";
     },
   },
 };

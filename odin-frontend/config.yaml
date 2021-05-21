@@ -1,4 +1,0 @@
-configuration:
-  servicePort: 8065
-  pathServicePort: 8066
-  data: "../data/"

@@ -1,9 +1,9 @@
-const fs = require("fs");
+const fileSystem = require("fs");
 const path = require("path");
 const readline = require("readline");
 const config = require("../configuration");
 const { logger } = require("../logging");
-const { fileToResponse } = require("../utils");
+const { fileToResponse, CONTENT_TYPE } = require("../utils");
 
 let datasetIndex = {};
 
@@ -12,15 +12,18 @@ let datasetIndex = {};
 }());
 
 function loadDatasetIndex() {
-  const filePath = path.join(config.data, "dataset-iri-to-file-name.json");
+  const filePath = path.join(config.data, "dataset-metadata.json");
   const readInterface = readline.createInterface({
-    "input": fs.createReadStream(filePath),
+    "input": fileSystem.createReadStream(filePath),
   });
   logger.info("Reading dataset index ...");
+  let content = "";
   readInterface.on("line", (line) => {
-    datasetIndex = JSON.parse(line);
+    content += line;
   }).on("close", () => {
-    logger.info("Reading dataset index ... done");
+    datasetIndex = JSON.parse(content).mapping;
+    logger.info("Reading dataset index ... done",
+      { "datasets": Object.keys(datasetIndex).length });
   });
 }
 
@@ -30,8 +33,8 @@ function iriToFileName(iri) {
 
 function streamDataset(response, iri) {
   const fileName = iriToFileName(iri);
-  const filePath = path.join(config.data, "datasets", `${fileName}.json`);
-  fileToResponse(filePath, response, "application/json");
+  const filePath = path.join(config.data, "dataset", `${fileName}.json`);
+  fileToResponse(filePath, response, CONTENT_TYPE.JSON);
 }
 
 module.exports = {

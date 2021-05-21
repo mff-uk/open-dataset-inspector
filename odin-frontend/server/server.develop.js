@@ -4,7 +4,7 @@ const path = require("path");
 const webpackMiddleware = require("webpack-dev-middleware");
 // https://github.com/webpack-contrib/webpack-hot-middleware
 const webpackHotMiddleware = require("webpack-hot-middleware");
-const config = require("../build/webpack.develop.js");
+const webpackDevelop = require("../build/webpack.develop.js");
 const server = require("./server.common");
 
 (function initialize() {
@@ -21,9 +21,9 @@ function initializeStatic(app) {
 }
 
 function initializeWebpack(app) {
-  const webpackCompiler = webpack(config);
+  const webpackCompiler = webpack(webpackDevelop);
   app.use(webpackMiddleware(webpackCompiler, {
-    "publicPath": config.output.publicPath.substr(1),
+    "publicPath": webpackDevelop.output.publicPath.substr(1),
     "stats": {
       "colors": true,
       "chunks": false,

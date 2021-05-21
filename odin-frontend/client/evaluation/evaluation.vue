@@ -15,6 +15,7 @@
       :methods="methods"
       :highlights="highlights"
       :ratings="ratings"
+      :languages="languages"
       @change-order="onChangeOrder"
       @change-method-rating="onChangeMethodRating"
       @copy-rating="onCopyMethodRating"
@@ -59,13 +60,13 @@ import randomColor from "randomcolor";
 import MethodArray from "./method-array.vue";
 import QueryPanel from "./query-panel.vue";
 import {
-  fetchSimilarDatasets,
+  getSimilarForGroup,
   shuffleArray,
   postEvaluation,
 } from "./evaluation-service.ts";
 import {
-  queryParamsToDatasetString,
-  datasetStringToArray,
+  queryParamsToText,
+  textToArray,
 } from "../utils.ts";
 import { required, decimal } from "./validators.ts";
 
@@ -88,6 +89,7 @@ export default {
       "dataset": "",
       "group": "",
     },
+    "languages": ["cs", "en"],
     "datasets": {},
     "methods": [],
     "description": "",
@@ -117,9 +119,10 @@ export default {
   },
   "mounted": function () {
     this.query = {
-      "dataset": queryParamsToDatasetString(this.$route.query.dataset),
+      "dataset": queryParamsToText(this.$route.query.dataset),
       "group": this.$route.query.group || "round-000",
     };
+    this.languages = this.$route.query.language || this.languages;
     this.load();
   },
   "methods": {
@@ -127,30 +130,31 @@ export default {
       const options = {
         "count": this.$route.query.count || 7,
       };
-      this.queryDatasets = datasetStringToArray(this.query.dataset);
-      fetchSimilarDatasets(this.query.group, this.queryDatasets, options)
-        .then((result) => {
-          if (this.queryDatasets.length > 0 && result.methods.length === 0) {
-            throw new Error("No similarities found, please check your query.");
-          }
-          shuffleArray(result.methods);
-          this.methods = result.methods;
-          this.datasets = result.datasets;
-          this.description = result.description;
-          this.ratings = {};
-          this.methods.forEach((method, index) => {
-            this.ratings[method.id] = String(index);
-          });
-          this.task.timeLoad = new Date().toISOString();
-        }).then(() => {
-          this.highlights = createHighlight(this.methods);
-        }).catch((error) => {
-          this.dialog = {
-            "visible": true,
-            "title": "Can't load datasets",
-            "body": error,
-          };
+      this.queryDatasets = textToArray(this.query.dataset);
+      getSimilarForGroup(
+        this.query.group, this.queryDatasets, options
+      ).then((result) => {
+        if (this.queryDatasets.length > 0 && result.method.length === 0) {
+          throw new Error("No similarities found, please check your query.");
+        }
+        shuffleArray(result.method);
+        this.methods = result.method;
+        this.datasets = result.datasets;
+        this.description = result.description;
+        this.ratings = {};
+        this.methods.forEach((method, index) => {
+          this.ratings[method.id] = String(index);
         });
+        this.task.timeLoad = new Date().toISOString();
+      }).then(() => {
+        this.highlights = createHighlight(this.methods);
+      }).catch((error) => {
+        this.dialog = {
+          "visible": true,
+          "title": "Can't load datasets",
+          "body": error,
+        };
+      });
     },
     "onChangeOrder": function (methods) {
       // We preserve ratings for methods, that did not moved.
@@ -166,16 +170,12 @@ export default {
       //
       this.ratings = nextRatings;
       this.methods = methods;
-      //
-      this.onSubmit("change-method-order");
     },
     "onChangeMethodRating": function (event) {
       this.ratings = {
         ...this.ratings,
         [event.method.id]: String(event.value),
       };
-      //
-      this.onSubmit("change-method-order-number");
     },
     "onCopyMethodRating": function (event) {
       const methodsToSet = [];
@@ -189,14 +189,13 @@ export default {
         newRatings[method] = event.value;
       }
       this.ratings = newRatings;
-      this.onSubmit("copy-method-rating");
     },
     "onSearch": function (search) {
       this.query = {
         ...this.query,
         ...search,
       };
-      const dataset = datasetStringToArray(search.dataset);
+      const dataset = textToArray(search.dataset);
       this.$router.push({
         "path": "evaluation",
         "query": {

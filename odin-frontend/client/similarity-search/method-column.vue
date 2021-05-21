@@ -1,22 +1,24 @@
 <template>
   <div class="method">
-    <div class="header">
-      {{ method.id }}
+    <div class="header ma-2">
+      {{ method.label }}
     </div>
     <div class="datasets">
       <div
-        v-for="item in method.datasets"
+        v-for="item in similar.datasets"
         :key="item.iri"
       >
         <method-dataset
+          :query="query[0]"
           :iri="item.iri"
           :dataset="datasets[item.iri]"
-          :background-color="highlights[item.iri]"
           :score="item.score"
+          :languages="languages"
+          :explainable="method.explainable && query.length === 1"
         />
       </div>
       <div
-        v-for="item in expectedDatasets"
+        v-for="item in expected"
         :key="item.iri"
       >
         <div class="position">
@@ -26,17 +28,22 @@
           </span>
         </div>
         <method-dataset
+          :query="query[0]"
           :iri="item.iri"
           :dataset="datasets[item.iri]"
           :score="item.score"
           :position="item.index"
+          :languages="languages"
+          :explainable="method.explainable && query.length === 1"
         />
       </div>
     </div>
     <div class="footer">
-      Visible {{ Object.keys(method.datasets).length }}
+      Visible {{ Object.keys(similar.datasets).length }}
       With same score
-      {{ method.numSameScoreAsLast }} / {{ method.numDatasets }}
+      {{ similar.numberOfDatasetsWithSameScoreAsTheLast }}
+      /
+      {{ similar.numberOfDatasets }}
       <v-btn
         x-small
         style="float: right"
@@ -49,7 +56,7 @@
 </template>
 
 <script>
-import MethodColumnDataset from "../evaluation/method-column-dataset.vue";
+import MethodColumnDataset from "../app-components/dataset-card.vue";
 
 export default {
   "name": "method-column",
@@ -57,10 +64,12 @@ export default {
     "method-dataset": MethodColumnDataset,
   },
   "props": {
+    "query": { "type": Array },
     "method": { "type": Object, "required": true },
     "datasets": { "type": Object, "required": true },
-    "highlights": { "type": Object, "required": true },
+    "similar": { "type": Object, "required": true },
     "expected": { "type": Array, "required": true },
+    "languages": { "type": Array, "required": true },
   },
   "computed": {
     "expectedDatasets": function () {

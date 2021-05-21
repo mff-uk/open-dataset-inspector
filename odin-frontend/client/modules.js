@@ -1,5 +1,5 @@
 import "./home";
 import "./help";
 import "./evaluation";
-import "./exploration";
-import "./visualisation";
+import "./similarity-search";
+import "./similarity-explanation";

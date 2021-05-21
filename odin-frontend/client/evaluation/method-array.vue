@@ -20,6 +20,7 @@
           :datasets="datasets"
           :rating="ratings[method.id]"
           :highlights="highlights"
+          :languages="languages"
           @change-rating="(value) => onChangeMethodRating(method, value)"
           @copy-rating="(value) => onCopyMethodRating(index, value)"
         />
@@ -43,6 +44,7 @@ export default {
     "methods": { "type": Array, "required": true },
     "ratings": { "type": Object, "required": true },
     "highlights": { "type": Object, "required": true },
+    "languages": { "type": Array, "required": true },
   },
   "computed": {
     "columnSize": function () {
