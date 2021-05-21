@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
-from collections import namedtuple, defaultdict
+from collections import namedtuple
 from dataclasses import dataclass
 
 import typing

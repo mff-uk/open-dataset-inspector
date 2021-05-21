@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import os
 
@@ -10,26 +9,29 @@ from compute_graph_similarity import *
 
 app = Flask(__name__)
 
-configuration = {}
-
 path_filter_selectors = {
     "closest": select_closest_for_each,
     "distance": select_paths_by_length
 }
 
 
-@app.route("/", methods=["POST"])
-def parse_request():
+def main():
+    configuration = load_configuration()
+    app.run(port=configuration["backendPort"])
+
+
+@app.route("/graph-similarity", methods=["POST"])
+def route_compute_graph_similarity():
     files = request.files.to_dict(flat=False)
     [left, right] = [
         load_dataset_from_json(json.load(file))
         for file in files["dataset"]
     ]
     options = json.load(files["options"][0])
-    return jsonify(compute_similarity(left, right, options))
+    return jsonify(compute_graph_similarity(left, right, options))
 
 
-def compute_similarity(left, right, options):
+def compute_graph_similarity(left, right, options):
     all_paths = find_all_path(left, right)
     method = options.get("method", "closest")
     selected_paths = path_filter_selectors[method](all_paths, options)
@@ -46,5 +48,4 @@ def load_configuration():
 
 
 if __name__ == "__main__":
-    configuration = load_configuration()
-    app.run(port=configuration["pathServicePort"])
+    main()
