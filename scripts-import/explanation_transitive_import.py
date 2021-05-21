@@ -88,8 +88,14 @@ def import_explanations(directory, explanation, mapping):
             }]
         }
         with open(file, "w", encoding="utf-8", newline="\n") as stream:
-            return json.dump(content, stream, ensure_ascii=False)
+            json.dump(content, stream, ensure_ascii=False)
 
 
 if __name__ == "__main__":
     main(_parse_arguments())
+
+with open("dataset-metadata.json") as stream:
+    data = json.load(stream)
+
+with open("dataset-metadata.json.out", "w", encoding="utf-8") as stream:
+    json.dump(data, stream, ensure_ascii=False, indent=2)

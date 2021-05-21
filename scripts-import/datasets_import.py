@@ -29,7 +29,7 @@ def main(arguments):
 
 
 def create_dataset_filter(filter_file: str):
-    def apply_true():
+    def apply_true(iri: str):
         return True
 
     if filter_file is None:
