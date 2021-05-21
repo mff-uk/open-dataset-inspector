@@ -61,7 +61,7 @@ def import_datasets(
         input_directory: str, dataset_directory: str,
         mapping: dict[str, str], dataset_filter):
     # Secure output directory.
-    os.makedirs(os.path.join(dataset_directory, "datasets"), exist_ok=True)
+    os.makedirs(os.path.join(dataset_directory, "dataset"), exist_ok=True)
     #
     file_names = os.listdir(input_directory)
     for file_name in file_names:
@@ -83,7 +83,7 @@ def import_datasets(
         # Convert the content.
         content = convert_dataset_file(content)
         # Write the output.
-        output_path = os.path.join(dataset_directory, "datasets", output_name)
+        output_path = os.path.join(dataset_directory, "dataset", output_name)
         with open(output_path, "w", encoding="utf-8") as stream:
             json.dump(content, stream, ensure_ascii=False)
 
@@ -104,13 +104,13 @@ def convert_dataset_file(content):
     for language in ["cs", "en"]:
         if "title-" + language in content:
             result["title"][language] = \
-                " ".join(extract_property("title" + language))
+                " ".join(extract_property("title-" + language))
         if "description-" + language in content:
             result["description"][language] = \
-                " ".join(extract_property("description" + language))
+                " ".join(extract_property("description-" + language))
         if "keywords-" + language in content:
             result["keywords"][language] = \
-                extract_property("keywords" + language)
+                extract_property("keywords-" + language)
 
     return result
 
