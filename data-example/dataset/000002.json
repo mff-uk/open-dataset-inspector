@@ -1,0 +1,17 @@
+{
+  "iri": "https://data.gov.cz/zdroj/datové-sady/https---dataor.justice.cz-api-3-action-package_show-id-sro-actual-praha-2013",
+  "title": {
+    "cs": "Společnost s ručením omezeným - Platný (Praha - 2013)"
+  },
+  "description": {
+    "cs": "Datová sada poskytuje povinné a volitelné údaje odpovídající typu právní formy Společnost s ručením omezeným navázané na Platný výpis pro rok 2013 dle přislušejícího soudu - Praha. Povinnými údaji pro tento typ právní formy je spisová značka, právní forma, název, sídlo, identifikační číslo, statutární orgán, počet členů statutárního orgánu, způsob jednání, základní kapitál, člen statutárního orgánu, společníci, společník, podíl, předměty podníkání a činnosti. Volitelnými údaji jsou zastoupení právnické osoby ve statutárním orgánu, zástavní právo, společný text ke všem společníkům, podílník společného podílu, prokura, společný text všem prokuristům, dozorčí rada, člen dozorčí rady, zastoupení právnické osoby v dozorčí radě, počet členů dozorčí rady, společný text ke všem členům dozorčí rady, ostatní skutečnosti, odštěpné závody, vedoucí odštěpného závodu vedoucí, EUID, likvidátoři, společný text všem likvidátorům, údaje o insolvenci,  právní důvod výmazu, údaj o podřízení zákonu, údaje o exekucích."
+  },
+  "keywords": {
+    "cs": [
+      "2013",
+      "Praha",
+      "Společnost s ručením omezeným",
+      "Platný"
+    ]
+  }
+}

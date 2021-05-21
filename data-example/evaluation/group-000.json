@@ -1,0 +1,8 @@
+{
+  "description": "All methods as of 30.4.2020. https://docs.google.com/document/d/13SIn9FFPGzNqbuD6ClMG8ZJsjcmK7OMnyUNZv2f-YNE/edit",
+  "methods": [
+    "mapping-wikidata",
+    "title-example"
+  ],
+  "fusion": "min"
+}

@@ -1,0 +1,17 @@
+{
+  "similarity": {
+    "mapping-wikidata": {
+      "paired": false,
+      "explanation": "knowledge-graph-mapping",
+      "label": "Wikidata",
+      "fusion": "min"
+    },
+    "title-example": {
+      "paired": true,
+      "explanation": "transitive-similarity",
+      "label": "Title Test",
+      "fusion": "min",
+      "explainable": true
+    }
+  }
+}

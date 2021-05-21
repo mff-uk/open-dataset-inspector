@@ -1,0 +1,17 @@
+{
+  "iri": "https://data.gov.cz/zdroj/datové-sady/https---dataor.justice.cz-api-3-action-package_show-id-ustav-actual-praha-2008",
+  "title": {
+    "cs": "Ústav - Platný (Praha - 2008)",
+    "en": "Institute - Valid (Praha - 2008)"
+  },
+  "description": {
+    "cs": "Datová sada poskytuje povinné a volitelné údaje odpovídající typu právní formy Ústav navázané na Platný výpis pro rok 2008 dle přislušejícího soudu - Praha. Povinnými údaji pro tento typ právní formy je spisová značka, právní forma, název, identifikační číslo, sídlo, statutární orgán - ředitel, počet členů statutárního orgánu, způsob jednání, správní rada, počet členů správní rady, základní kapitál. Volitelnými údaji jsou předmět činnosti, předmět podnikání, dozorčí rada, člen dozorčí rady, zastoupení právnické osoby v dozorčí radě, počet členů dozorčí rady, společný text ke všem členům dozorčí rady, revizor, zastoupení právnické osoby revizor, ostatní skutečnosti, člen správní rady, zastoupení právnické osoby ve správní radě způsob jednání správní rady, zakladatelé, společný text ke všem zakladatelům, likvidátoři, společný text ke všem likvidátorům, údaje o insolvenci, právní důvod výmazu, údaj o podřízení zákonu, údaje o exekuci."
+  },
+  "keywords": {
+    "cs": [
+      "Praha",
+      "Platný Ústav",
+      "2008"
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "datasets": [
+    "https://data.gov.cz/zdroj/datové-sady/https---dataor.justice.cz-api-3-action-package_show-id-ustav-actual-usti_nad_labem-2015",
+    "https://data.gov.cz/zdroj/datové-sady/https---dataor.justice.cz-api-3-action-package_show-id-ustav-actual-praha-2008"
+  ],
+  "explanation": [{
+    "dist": 1.0,
+    "lowerBound": 8,
+    "upperBound": 6302,
+    "middle": []
+  }]
+}

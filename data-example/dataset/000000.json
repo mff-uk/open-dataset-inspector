@@ -1,0 +1,23 @@
+{
+  "iri": "https://data.gov.cz/zdroj/datové-sady/https---dataor.justice.cz-api-3-action-package_show-id-ustav-actual-usti_nad_labem-2015",
+  "title": {
+    "cs": "Ústav - Platný (Ústí nad Labem - 2015)",
+    "en": "Institute - Valid (Ústí nad Labem - 2015)"
+  },
+  "description": {
+    "cs": "Datová sada poskytuje povinné a volitelné údaje odpovídající typu právní formy Ústav navázané na Platný výpis pro rok 2015 dle přislušejícího soudu - Ústí nad Labem. Povinnými údaji pro tento typ právní formy je spisová značka, právní forma, název, identifikační číslo, sídlo, statutární orgán - ředitel, počet členů statutárního orgánu, způsob jednání, správní rada, počet členů správní rady, základní kapitál. Volitelnými údaji jsou předmět činnosti, předmět podnikání, dozorčí rada, člen dozorčí rady, zastoupení právnické osoby v dozorčí radě, počet členů dozorčí rady, společný text ke všem členům dozorčí rady, revizor, zastoupení právnické osoby revizor, ostatní skutečnosti, člen správní rady, zastoupení právnické osoby ve správní radě způsob jednání správní rady, zakladatelé, společný text ke všem zakladatelům, likvidátoři, společný text ke všem likvidátorům, údaje o insolvenci, právní důvod výmazu, údaj o podřízení zákonu, údaje o exekuci.",
+    "en": "The data set provides mandatory and optional data corresponding to the type of legal form of the Institute linked to the Valid Statement for 2015 according to the relevant court - Ústí nad Labem. Mandatory data for this type of legal form are file number, legal form, name, identification number, registered office, statutory body - director, number of members of the statutory body, manner of proceedings, board of directors, number of board members, share capital. Optional data are subject of activity, subject of business, supervisory board, member of the supervisory board, representation of a legal entity in the supervisory board, number of members of the supervisory board, joint text for all members of the supervisory board, auditor, representation of a legal entity auditor, other facts, member of the board, representation of a legal entity in the board of directors manner of proceedings of the board of directors, founders, common text to all founders, liquidators, common text to all liquidators, data on insolvency, legal reason for deletion, information on subordination of the law, data on execution."
+  },
+  "keywords": {
+    "cs": [
+      "2015",
+      "Ústí nad Labem",
+      "Ústav Platný"
+    ],
+    "en": [
+      "2015",
+      "Ústí nad Labem",
+      "Institute Valid"
+    ]
+  }
+}

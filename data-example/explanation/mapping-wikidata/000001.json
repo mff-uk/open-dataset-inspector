@@ -1,0 +1,277 @@
+{
+  "iri": "https://data.gov.cz/zdroj/datové-sady/https---dataor.justice.cz-api-3-action-package_show-id-ustav-actual-praha-2008",
+  "mappings": [
+    {
+      "metadata": {
+        "from": "title",
+        "title": "Wikidata",
+        "input": [
+          "ustav",
+          "-",
+          "platny",
+          "(",
+          "Usti",
+          "nad",
+          "Labe",
+          "-",
+          "2015",
+          ")"
+        ]
+      },
+      "data": [
+        {
+          "id": "Q56457912",
+          "metadata": {
+            "group": [
+              "ustav"
+            ],
+            "directly_mapped": true,
+            "directly_mapped_group": [
+              "ustav"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "from": "description",
+        "title": "Wikidata",
+        "input": [
+          "datovy",
+          "sada",
+          "poskytovat",
+          "povinny",
+          "a",
+          "volitelny",
+          "udaj",
+          "odpovidajici",
+          "typ",
+          "pravni",
+          "forma",
+          "ustav",
+          "navazany",
+          "na",
+          "platny",
+          "vypis",
+          "pro",
+          "rok",
+          "2015",
+          "dle",
+          "prislusejici",
+          "soud",
+          "-",
+          "Usti",
+          "nad",
+          "Labe",
+          ".",
+          "povinny",
+          "udaj",
+          "pro",
+          "tento",
+          "typ",
+          "pravni",
+          "forma",
+          "byt",
+          "spisovy",
+          "znacka",
+          ",",
+          "pravni",
+          "forma",
+          ",",
+          "nazev",
+          ",",
+          "identifikacni",
+          "cislo",
+          ",",
+          "sidlo",
+          ",",
+          "statutarni",
+          "organ",
+          "-",
+          "reditel",
+          ",",
+          "pocet",
+          "clen",
+          "statutarni",
+          "organ",
+          ",",
+          "zpusob",
+          "jednani",
+          ",",
+          "spravni",
+          "rada",
+          ",",
+          "pocet",
+          "clen",
+          "spravni",
+          "rada",
+          ",",
+          "zakladni",
+          "kapital",
+          ".",
+          "volitelny",
+          "udaj",
+          "byt",
+          "predmet",
+          "cinnost",
+          ",",
+          "predmet",
+          "podnikani",
+          ",",
+          "dozorci",
+          "rada",
+          ",",
+          "clen",
+          "dozorci",
+          "rada",
+          ",",
+          "zastoupeni",
+          "pravnicky",
+          "osoba",
+          "v",
+          "dozorci",
+          "rada",
+          ",",
+          "pocet",
+          "clen",
+          "dozorci",
+          "rada",
+          ",",
+          "spolecny",
+          "text",
+          "k",
+          "vsechen",
+          "clen",
+          "dozorci",
+          "rada",
+          ",",
+          "revizor",
+          ",",
+          "zastoupeni",
+          "pravnicky",
+          "osoba",
+          "revizor",
+          ",",
+          "ostatni",
+          "skutecnost",
+          ",",
+          "clen",
+          "spravni",
+          "rada",
+          ",",
+          "zastoupeni",
+          "pravnicky",
+          "osoba",
+          "v",
+          "spravni",
+          "rada",
+          "zpusob",
+          "jednani",
+          "spravni",
+          "rada",
+          ",",
+          "zakladatel",
+          ",",
+          "spolecny",
+          "text",
+          "k",
+          "vsechen",
+          "zakladatel",
+          ",",
+          "likvidator",
+          ",",
+          "spolecny",
+          "text",
+          "k",
+          "vsechen",
+          "likvidator",
+          ",",
+          "udaj",
+          "o",
+          "insolvence",
+          ",",
+          "pravni",
+          "duvod",
+          "vymaz",
+          ",",
+          "udaj",
+          "o",
+          "podrizeni",
+          "zakon",
+          ",",
+          "udaj",
+          "o",
+          "exekuce",
+          "."
+        ]
+      },
+      "data": [
+        {
+          "id": "Q190087",
+          "metadata": {
+            "group": [
+              "typ",
+              "datovy"
+            ],
+            "directly_mapped": true,
+            "directly_mapped_group": [
+              "typ",
+              "datovy"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "from": "keywords",
+        "title": "Wikidata",
+        "input": [
+          [
+            "ustav"
+          ],
+          [
+            "Usti",
+            "nad",
+            "Labe"
+          ],
+          [
+            "2015"
+          ],
+          [
+            "platny"
+          ]
+        ]
+      },
+      "data": [
+        {
+          "id": "Q56457912",
+          "metadata": {
+            "group": [
+              "ustav"
+            ],
+            "directly_mapped": true,
+            "directly_mapped_group": [
+              "ustav"
+            ]
+          }
+        },
+        {
+          "id": "Q17329259",
+          "metadata": {
+            "group": [
+              "ustav",
+              "platny"
+            ],
+            "reduced_from": [
+              "Q23866354",
+              "Q23859360"
+            ],
+            "directly_mapped": false
+          }
+        }
+      ]
+    }
+  ]
+}
