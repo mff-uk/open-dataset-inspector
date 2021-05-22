@@ -90,9 +90,7 @@ def import_datasets(
 
 def convert_dataset_file(content):
     def extract_property(name):
-        if name in content:
-            content[name].get("data", [])
-        return ""
+        return content[name].get("data", []) if name in content else ""
 
     result = {
         "iri": content["iri"],
