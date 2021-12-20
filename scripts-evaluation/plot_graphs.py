@@ -10,10 +10,8 @@ import numpy
 import plotly
 import plotly.express
 
-# Change to your local setting!
-plotly.io.orca.config.executable = "C:/Users/Petr/AppData/Local/Programs/orca/orca.exe"
-
-OUTPUT_ROOT = "../data/evaluation-reports-graphs/20201015"
+# https://github.com/plotly/Kaleido/issues/101
+plotly.io.kaleido.scope.mathjax = None
 
 SIMILARITY_DASH = {
     "hausdorff": "dash",
@@ -31,7 +29,7 @@ DESCRIPTOR_COLOR = {
     "title": "#ffd700"
 }
 
-METHOD_METADATA = {
+METHOD_METADATA_20200621 = {
     "nkod-_title_description_.join.reduce.tlsh.tlsh": {
         "label": "tlsh : title description",
         "color": "black",
@@ -95,27 +93,86 @@ METHOD_METADATA = {
     },
 }
 
+METHOD_METADATA_20201106 = {
+    "nkod-description.bert.vector.cosine": {
+        "label": "B.1 cosine : description bert",
+        "color": "#37CDCD",
+        "dash": SIMILARITY_DASH["cosine"],
+    },
+    "nkod-description.udpipe-f.reduce.hausdorff[labels.80.40.d]": {
+        "label": "B.2 hausdorff : description : [labels.80.40.d]",
+        "color": "#0099FF",
+        "dash": SIMILARITY_DASH["hausdorff"],
+    },
+    "nkod-description.udpipe-f.reduce.word2vec[labels.160.40.d].vector.cosine": {
+        "label": "B.3 cosine : description : word2vec[labels.160.40.d]",
+        "color": "#3668FF",
+        "dash": SIMILARITY_DASH["cosine"],
+    },
+    "nkod-title.bert.vector.cosine": {
+        "label": "B.4 cosine : title : bert",
+        "color": "#FFCD07",
+        "dash": SIMILARITY_DASH["cosine"],
+    },
+    "nkod-title.udpipe-f.reduce.hausdorff[labels.80.40.d]": {
+        "label": "B.5 hausdorff : title : [labels.80.40.d]",
+        "color": "#FF8D41",
+        "dash": SIMILARITY_DASH["hausdorff"],
+    },
+    "nkod-title.udpipe-f.reduce.word2vec[cswiki].vector.cosine": {
+        "label": "B.6 cosine : title [cswiki]",
+        "color": "#9E3D0D",
+        "dash": SIMILARITY_DASH["cosine"],
+    },
+    "nkod-title.udpipe-f.reduce.word2vec[labels.80.40.d].vector.cosine": {
+        "label": "B.7 cosine : title : word2vec[labels.80.40.d]",
+        "color": "#EFA861",
+        "dash": SIMILARITY_DASH["cosine"],
+    },
+    "nkod-title.udpipe-f.reduce.words_set.jaccard": {
+        "label": "B.8 jaccard : title",
+        "color": "#704011",
+        "dash": SIMILARITY_DASH["jaccard"],
+    },
+    "nkod-wikidata-concepts-d.concat.reduce.word2vec[concepts.80.40.d].vector.cosine" : {
+        "label": "B.9 cosine : wikidata : word2vec[labels.80.40.d]",
+        "color": "#761A76",
+        "dash": SIMILARITY_DASH["cosine"],
+    },
+    "nkod-wikidata-concepts.concat.reduce.word2vec[concepts.40.10.d].vector.cosine" : {
+        "label": "B.10 cosine : wikidata : word2vec[labels.40.10.d]",
+        "color": "#FF1DFF",
+        "dash": SIMILARITY_DASH["cosine"],
+    },
+}
+
 PLOT_EXTENSION = "pdf"
 
 
 def main():
-    evaluations = load_json(
-        "../data/evaluation-reports-archive/"
-        "20200621-evaluation-reports-summary.json"
-    )
-    os.makedirs(OUTPUT_ROOT, exist_ok=True)
-    prepare_index()
-    plot_data_iiwas(evaluations)
-    # plot_data(evaluations)
-    finalize_index()
+    global METHOD_METADATA
+
+    METHOD_METADATA = METHOD_METADATA_20200621
+    evaluations = load_json("../data/evaluation/20200621.json")
+    output_directory = "../data/evaluation/20200621/"
+    os.makedirs(output_directory, exist_ok=True)
+    prepare_index(output_directory)
+    evaluate_20200621(output_directory, evaluations)
+    finalize_index(output_directory)
+
+    METHOD_METADATA = METHOD_METADATA_20201106
+    output_directory = "../data/evaluation/20201106/"
+    os.makedirs(output_directory, exist_ok=True)
+    evaluations = load_json("../data/evaluation/20201106.json")
+    plot_data_20201106(output_directory, evaluations)
 
 
-def prepare_index():
-    with open(os.path.join(OUTPUT_ROOT, "index.html"), "w") as stream:
+def prepare_index(directory: dir):
+    with open(os.path.join(directory, "index.html"), "w") as stream:
         stream.write("<html><body><ul>")
 
 
-def plot_data_iiwas(evaluations):
+def evaluate_20200621(output_directory, evaluations):
     def map_use_case(usecase):
         return "S" + usecase
 
@@ -128,15 +185,19 @@ def plot_data_iiwas(evaluations):
             "1978": "U5"
         }[user]
 
-    raw_scores_used_by_user_per_use_case(evaluations, map_user)
-    plot_overall_method_performance(evaluations)
-    plot_methods_per_user_normalized(evaluations, map_user)
-    plot_methods_per_use_case_normalized(evaluations, map_use_case)
+    raw_scores_used_by_user_per_use_case(
+        output_directory, evaluations, map_user)
+    plot_overall_method_performance(
+        output_directory, evaluations)
+    plot_methods_per_user_normalized(
+        output_directory, evaluations, map_user)
+    plot_methods_per_use_case_normalized(
+        output_directory, evaluations, map_use_case)
 
     plot_methods_per_use_case_normalized_for_method(
+        output_directory,
         evaluations,
-        "Normalized methods performance per user-case for "
-        + "jaccard: title",
+        "Normalized methods performance per user-case for jaccard: title",
         "nkod-title.udpipe-f.reduce.words_set.jaccard",
         "-jaccard-title",
         map_use_case,
@@ -144,9 +205,9 @@ def plot_data_iiwas(evaluations):
     )
 
     plot_methods_per_use_case_normalized_for_method(
+        output_directory,
         evaluations,
-        "Normalized methods performance per user-case for "
-        + "cosine: title [cswiki]",
+        "Normalized methods performance per user-case for cosine: title [cswiki]",
         "nkod-title.udpipe-f.reduce.word2vec[cswiki].vector.cosine",
         "-cosine-title-cswiki",
         map_use_case,
@@ -154,47 +215,17 @@ def plot_data_iiwas(evaluations):
     )
 
 
-def plot_data(evaluations):
+def plot_data_20201106(output_directory, evaluations):
     def map_use_case(usecase):
         return "S" + usecase
 
-    def map_user(user):
-        return {
-            "Martin": "U1",
-            "Kuba": "U2",
-            "PeSk": "U3",
-            "DaBe": "U4",
-            "1978": "U5"
-        }[user]
-
-    raw_scores_used_by_user(evaluations, map_user)
-    raw_scores_used_by_user_per_use_case_histograms(evaluations, map_user)
-
-    plot_methods_per_user(evaluations, map_user)
-    plot_methods_per_use_case(evaluations, map_use_case)
-
-    plot_methods_per_use_case_normalized_for_method(
-        evaluations,
-        "Normalized methods performance per user-case for "
-        + "jaccard: title",
-        "nkod-title.udpipe-f.reduce.words_set.jaccard",
-        "rgb(239, 85, 59)",
-        "-jaccard-title-method-sort",
-        map_use_case
-    )
-    plot_methods_per_use_case_normalized_for_method(
-        evaluations,
-        "Normalized methods performance per user-case for "
-        + "cosine: title [cswiki]",
-        "nkod-title.udpipe-f.reduce.word2vec[cswiki].vector.cosine",
-        "rgb(254, 203, 82)",
-        "-cosine-title-cswiki-method-sort",
-        map_use_case
-    )
+    plot_methods_per_use_case_normalized(
+        output_directory, evaluations, map_use_case)
 
 
-def on_plot_ready(figure, file_name, description, width=1024, height=768):
-    figure_path = os.path.join(OUTPUT_ROOT, file_name)
+def on_plot_ready(figure, file_name, description, output_directory,
+                  width=1024, height=768):
+    figure_path = os.path.join(output_directory, file_name)
     figure.write_image(
         figure_path + "." + PLOT_EXTENSION,
         width=width,
@@ -202,14 +233,14 @@ def on_plot_ready(figure, file_name, description, width=1024, height=768):
     # Save as HTML file to allow web-based browsing of the data.
     if not os.path.exists(figure_path + ".html"):
         figure.write_html(figure_path + ".html")
-    with open(os.path.join(OUTPUT_ROOT, "index.html"), "a") as stream:
+    with open(os.path.join(output_directory, "index.html"), "a") as stream:
         stream.write(
-            '<li><a href="./evaluation-reports-graphs/{}">{}</a></li>'.format(
+            '<li><a href="./{}">{}</a></li>'.format(
                 file_name + ".html", description))
 
 
-def finalize_index():
-    with open(os.path.join(OUTPUT_ROOT, "index.html"), "a") as stream:
+def finalize_index(output_directory):
+    with open(os.path.join(output_directory, "index.html"), "a") as stream:
         stream.write("</ul></body></html>")
 
 
@@ -218,7 +249,7 @@ def load_json(file: str):
         return json.load(stream)
 
 
-def raw_scores_used_by_user(evaluations, map_user):
+def raw_scores_used_by_user(output_directory, evaluations, map_user):
     """
     Show values as used by users, for each value use total count it was used.
     A single value can be used multiple times in a single user-case.
@@ -234,7 +265,7 @@ def raw_scores_used_by_user(evaluations, map_user):
         data, "Absolute ranking category")
     on_plot_ready(figure, "user-ratings",
                   "For each user show how many times they have used "
-                  "a given ranking value.")
+                  "a given ranking value.", output_directory)
 
 
 def _create_figure_scores_per_user(data, title):
@@ -277,7 +308,8 @@ def _create_figure_scores_per_user(data, title):
     return figure
 
 
-def raw_scores_used_by_user_per_use_case(evaluations, map_user):
+def raw_scores_used_by_user_per_use_case(output_directory, evaluations,
+                                         map_user):
     """
     Modification of raw_scores_used_by_user
     Count only per use-case, i.e. max value is equal to number of use-cases.
@@ -297,10 +329,11 @@ def raw_scores_used_by_user_per_use_case(evaluations, map_user):
         "user-ratings-per-use-case",
         "For each user show how in how many use-cases they "
         "have used a given value.",
-        height=1024)
+        output_directory, height=1024)
 
 
-def raw_scores_used_by_user_per_use_case_histograms(evaluations, map_user):
+def raw_scores_used_by_user_per_use_case_histograms(
+        output_directory, evaluations, map_user):
     # df = plotly.express.data.tips()
     # counts, bins = numpy.histogram(df.total_bill, bins=range(0, 60, 5))
     # print("X", bins) [ 1 16 63 67 41 24 16  6  5  4  1] <- pocty
@@ -346,10 +379,10 @@ def raw_scores_used_by_user_per_use_case_histograms(evaluations, map_user):
             "user-ratings-per-use-case-histogram-" + user + "",
             "For " + user + " show how in how many use-cases they "
                             "have used a given value.",
-            height=1024)
+            output_directory, height=1024)
 
 
-def plot_overall_method_performance(evaluations):
+def plot_overall_method_performance(output_directory, evaluations):
     data = collections.defaultdict(list)
     for evaluation in evaluations:
         for method, rating in evaluation["rating"].items():
@@ -381,10 +414,10 @@ def plot_overall_method_performance(evaluations):
         figure,
         "methods-overall-performance",
         "Show relative method performance as a box-plot using.",
-        height=1024)
+        output_directory, height=1024)
 
 
-def plot_methods_per_user(evaluations, map_user):
+def plot_methods_per_user(output_directory, evaluations, map_user):
     users, lines = _prepare_method_per_user_data(evaluations, map_user)
     # Plot
     figure = _create_figure_rating_per_category(
@@ -397,7 +430,7 @@ def plot_methods_per_user(evaluations, map_user):
         figure,
         "methods-per-user-performance",
         "Show how each method perform for given user.",
-        height=1024)
+        output_directory, height=1024)
 
 
 def _prepare_method_per_user_data(evaluations, map_user):
@@ -467,7 +500,7 @@ def _create_figure_rating_per_category(lines, title, y_title, y_ticks):
     return figure
 
 
-def plot_methods_per_user_normalized(evaluations, map_user):
+def plot_methods_per_user_normalized(output_directory, evaluations, map_user):
     """
     Update of plot_methods_per_user, users can have different maximum
     score, in this graph we make all max to be equal so the top method
@@ -485,7 +518,8 @@ def plot_methods_per_user_normalized(evaluations, map_user):
     on_plot_ready(figure, "methods-per-user-performance-normalized",
                   "Show how each method perform for given user. The "
                   "performance for each method are normalized so the "
-                  "best performing method has performance equal to 1.")
+                  "best performing method has performance equal to 1.",
+                  output_directory)
 
 
 def _normalize_lines_per_category(lines, categories):
@@ -508,7 +542,7 @@ def _normalize_lines_per_category(lines, categories):
     ]
 
 
-def plot_methods_per_use_case(evaluations, map_use_case):
+def plot_methods_per_use_case(output_directory, evaluations, map_use_case):
     use_cases, lines = \
         _prepare_plot_methods_per_use_case_data(evaluations, map_use_case)
     use_cases, lines = _order_lines_by_mean_decreasing(use_cases, lines)
@@ -520,7 +554,8 @@ def plot_methods_per_use_case(evaluations, map_use_case):
         y_ticks=use_cases
     )
     on_plot_ready(figure, "methods-per-use-case-performance",
-                  "Relative performance of methods by use-cases.")
+                  "Relative performance of methods by use-cases.",
+                  output_directory)
 
 
 def _order_lines_by_mean_decreasing(categories, lines):
@@ -576,7 +611,8 @@ def _prepare_plot_methods_per_use_case_data(evaluations, map_use_case):
     return use_cases, lines
 
 
-def plot_methods_per_use_case_normalized(evaluations, map_use_case):
+def plot_methods_per_use_case_normalized(
+        output_directory, evaluations, map_use_case):
     use_cases, lines = \
         _prepare_plot_methods_per_use_case_data(evaluations, map_use_case)
     normalized_lines = _normalize_lines_per_category(lines, use_cases)
@@ -595,7 +631,7 @@ def plot_methods_per_use_case_normalized(evaluations, map_use_case):
         "Relative performance of methods by use-cases. Performance "
         "is normalized so on each use-case the best method have "
         "performance equal to 1.",
-        height=1024)
+        output_directory, height=1024)
 
 
 def _order_lines_by_method_decreasing(categories, lines, method):
@@ -627,7 +663,7 @@ def _select_line_by_method(lines, method):
 
 
 def plot_methods_per_use_case_normalized_for_method(
-        evaluations, title, method, suffix,
+        output_directory, evaluations, title, method, suffix,
         map_use_case, order_by_method=True):
     use_cases, lines = \
         _prepare_plot_methods_per_use_case_data(evaluations, map_use_case)
@@ -660,7 +696,7 @@ def plot_methods_per_use_case_normalized_for_method(
         + suffix + "",
         "Normalized relative performance of methods by use-cases "
         "for " + method + " sorted:" + str(order_by_method),
-        width=1024)
+        output_directory, width=1024)
 
 
 if __name__ == "__main__":

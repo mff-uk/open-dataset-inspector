@@ -70,32 +70,33 @@ class EvaluationStatistics:
 
 
 def main():
-    evaluate_iiwas_2020()
+    print("#" * 80)
+    print(" 20200621 - iiwas")
+    evaluate_20200621()
+    print("#" * 80)
+    print(" 20201106 - iiwas")
+    evaluate_20201106()
 
 
-def evaluate_iiwas_2020():
-    evaluation_directory = "../data/evaluation-reports-archive/20200621"
-    evaluations = load_evaluations(evaluation_directory)
+def evaluate_20200621():
+    evaluation_directory = "../data/evaluation/collected/20200621"
+    evaluations = _load_evaluations(evaluation_directory)
     evaluations = [item for item in evaluations
                    if item.user not in ["Test", "MaNe"]]
-    evaluations = normalize_with_respect_to_method(
+    evaluations = _normalize_with_respect_to_method(
         evaluations, "nkod-_title_description_.join.reduce.tlsh.tlsh")
-    evaluations = keep_last_submits(evaluations)
+    evaluations = _keep_last_submits(evaluations)
 
-    export_evaluations(
-        evaluations,
-        "../data/evaluation-reports-archive/"
-        "20200621-evaluation-reports-summary.json"
-    )
+    _export_evaluations(evaluations, "../data/evaluation/20200621.json")
 
-    evaluate_and_print(evaluations)
+    _evaluate_and_print(evaluations)
 
-    for user, user_evaluations in iterate_per_user(evaluations):
+    for user, user_evaluations in _iterate_per_user(evaluations):
         print("# user:", user, "count:", len(user_evaluations))
-        evaluate_and_print(user_evaluations)
+        _evaluate_and_print(user_evaluations)
 
 
-def load_evaluations(
+def _load_evaluations(
         evaluation_directory: str) -> typing.List[RawEvaluationSubmit]:
     result = []
     for file_name in os.listdir(evaluation_directory):
@@ -113,10 +114,10 @@ def load_evaluations(
             dateutil.parser.parse(content["task"]["timePost"]),
             content["task"]["action"]
         ))
-    return group_raw_results(result)
+    return _group_raw_results(result)
 
 
-def group_raw_results(evaluations: typing.List[RawEvaluationAction]) \
+def _group_raw_results(evaluations: typing.List[RawEvaluationAction]) \
         -> typing.List[RawEvaluationSubmit]:
     considered_actions = ["change-method-order", "change-method-order-number"]
     collector = collections.defaultdict(list)
@@ -147,7 +148,7 @@ def group_raw_results(evaluations: typing.List[RawEvaluationAction]) \
     return result
 
 
-def normalize_with_respect_to_method(
+def _normalize_with_respect_to_method(
         data: typing.List[RawEvaluation], method: str) \
         -> typing.List[RawEvaluation]:
     """
@@ -155,7 +156,7 @@ def normalize_with_respect_to_method(
     number 0 or 5 - we need to consider both of these the same.
 
     For this reason we normalize the values into interval <-1, 1> when 0
-    is equal score of the method of given name. Thus the given method is
+    is equal score of the method of given name. Thus, the given method is
     used as a baseline.
 
     In the input we also assume that smaller is better as the input is
@@ -172,7 +173,7 @@ def normalize_with_respect_to_method(
         def normalize(value: float) -> float:
             """
             Center by subtracting given method result scale to -1, 1 by where
-            either -1 or 1 is the min. or max valuerespectively.
+            either -1 or 1 is the min. or max value respectively.
             We can not scale to full -1, 1 always as we need the ref
             method to be zero.
             """
@@ -192,7 +193,7 @@ def normalize_with_respect_to_method(
     return result
 
 
-def keep_last_submits(data: typing.List[RawEvaluation]) \
+def _keep_last_submits(data: typing.List[RawEvaluation]) \
         -> typing.List[RawEvaluation]:
     result = {}
     for item in data:
@@ -204,14 +205,14 @@ def keep_last_submits(data: typing.List[RawEvaluation]) \
     return list(result.values())
 
 
-def evaluate_and_print(evaluations: typing.List[RawEvaluation]):
-    ratings = collect_methods_ratings(evaluations)
+def _evaluate_and_print(evaluations: typing.List[RawEvaluation]):
+    ratings = _collect_methods_ratings(evaluations)
     statistics = [EvaluationStatistics(item.method, item.scores)
                   for item in ratings]
-    print_statistics(statistics)
+    _print_statistics(statistics)
 
 
-def collect_methods_ratings(
+def _collect_methods_ratings(
         data: typing.List[RawEvaluation]) -> typing.List[MethodEvaluation]:
     result = collections.defaultdict(list)
     for user_evaluation in data:
@@ -222,7 +223,7 @@ def collect_methods_ratings(
             for method, values in result.items()]
 
 
-def print_statistics(
+def _print_statistics(
         statistics: typing.List[EvaluationStatistics],
         ref_method="nkod-_title_description_.join.reduce.tlsh.tlsh",
         print_values=True,
@@ -257,9 +258,8 @@ def print_statistics(
         scores_by_use_case = collections.defaultdict(list)
         for score in sorted_stats[0].scores:
             scores_by_use_case[score.evaluation.use_case].append(score)
-        import pprint
         duration_by_use_case = {
-            use_case: numpy.mean(get_scores_evaluation_durations(scores))
+            use_case: numpy.mean(_get_scores_evaluation_durations(scores))
             for use_case, scores in scores_by_use_case.items()
         }
         values = [duration_by_use_case.get(use_case, None)
@@ -268,7 +268,7 @@ def print_statistics(
         print(", ".join(["{:5d}".format(int(x)) for x in values]))
 
 
-def get_scores_evaluation_durations(scores: typing.List[Score]) \
+def _get_scores_evaluation_durations(scores: typing.List[Score]) \
         -> typing.List[float]:
     scores_durations = []
     for score in scores:
@@ -278,13 +278,13 @@ def get_scores_evaluation_durations(scores: typing.List[Score]) \
     return scores_durations
 
 
-def iterate_per_user(evaluations: typing.List[RawEvaluation]):
+def _iterate_per_user(evaluations: typing.List[RawEvaluation]):
     users = {item.user for item in evaluations}
     for user in users:
         yield user, [item for item in evaluations if item.user == user]
 
 
-def export_evaluations(
+def _export_evaluations(
         evaluations: typing.List[RawEvaluationSubmit], output: str):
     result = []
     date_format = "%Y.%m.%dT%H:%M:%S"
@@ -301,6 +301,51 @@ def export_evaluations(
         })
     with open(output, "w", encoding="utf-8") as stream:
         json.dump(result, stream, indent=2)
+
+
+def evaluate_20201106():
+    evaluation_directory = "../data/evaluation/collected/20201106"
+    evaluations = _load_evaluations(evaluation_directory)
+    evaluations = [item for item in evaluations
+                   if item.user not in ["Test", "Martin"]]
+    evaluations = _normalize(evaluations)
+    evaluations = _keep_last_submits(evaluations)
+
+    _export_evaluations(evaluations, "../data/evaluation/20201106.json")
+
+
+def _normalize(data: typing.List[RawEvaluation]) -> typing.List[RawEvaluation]:
+    """
+    We collect data as user ratings, but user may rate all methods with same
+    number 0 or 5 - we need to consider both of these the same.
+
+    For this reason we normalize the values into interval <0, 1>, representing
+    the worst and best scored method.
+
+    In the input we also assume that smaller is better as the input is
+    ordering.
+    """
+    result = []
+    for item in data:
+        scale = max([
+            abs(value)
+            for value in item.raw_rating.values()
+        ])
+
+        def normalize(value: float) -> float:
+            # We need to change the order so 1 -> 0, 0 -> 1.
+            value = 1 - (value / scale if scale > 0 else 0)
+            # Now we map that to -1 1
+            return (2 * value) - 1
+
+        rating = {
+            key: normalize(value)
+            for key, value in item.raw_rating.items()
+        }
+        result_item = copy.copy(item)
+        result_item.rating = rating
+        result.append(result_item)
+    return result
 
 
 if __name__ == "__main__":
